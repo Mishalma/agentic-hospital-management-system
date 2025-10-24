@@ -1,0 +1,25 @@
+{
+  "name": "healthtech-scheduler",
+  "version": "1.0.0",
+  "description": "Unified Digital Registration & Appointment Scheduler MVP",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "backend": "cd backend && npm run dev",
+    "frontend": "cd frontend && npm start",
+    "install-all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "setup": "node scripts/setup.js",
+    "postinstall": "node scripts/setup.js"
+  },
+  "keywords": [
+    "healthtech",
+    "scheduler",
+    "registration",
+    "hackathon"
+  ],
+  "author": "HealthTech Team",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

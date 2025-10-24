@@ -1,0 +1,712 @@
+.pharmacy-transactions {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+  background: #f8f9fa;
+  min-height: 100vh;
+}
+
+.transactions-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.transactions-header h1 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-primary {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  background: #3498db;
+  color: white;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background: #2980b9;
+  transform: translateY(-2px);
+}
+
+.btn-secondary {
+  padding: 12px 24px;
+  border: 1px solid #3498db;
+  border-radius: 8px;
+  background: white;
+  color: #3498db;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background: #3498db;
+  color: white;
+}
+
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.summary-card {
+  display: flex;
+  align-items: center;
+  padding: 25px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.summary-card:hover {
+  transform: translateY(-5px);
+}
+
+.summary-card:nth-child(1) {
+  border-left: 4px solid #27ae60;
+}
+
+.summary-card:nth-child(2) {
+  border-left: 4px solid #3498db;
+}
+
+.summary-card:nth-child(3) {
+  border-left: 4px solid #f39c12;
+}
+
+.summary-card:nth-child(4) {
+  border-left: 4px solid #e74c3c;
+}
+
+.summary-icon {
+  font-size: 40px;
+  margin-right: 20px;
+}
+
+.summary-content h3 {
+  margin: 0 0 5px 0;
+  font-size: 28px;
+  font-weight: 700;
+  color: #2c3e50;
+}
+
+.summary-content p {
+  margin: 0;
+  color: #7f8c8d;
+  font-size: 16px;
+}
+
+.transaction-filters {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.transaction-filters select {
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+  background: white;
+  min-width: 150px;
+}
+
+.date-range-inputs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.date-range-inputs input {
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.date-range-inputs span {
+  color: #7f8c8d;
+  font-weight: 500;
+}
+
+.transactions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.no-transactions {
+  text-align: center;
+  padding: 60px 20px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.no-transactions p {
+  color: #7f8c8d;
+  font-size: 18px;
+  margin: 0;
+}
+
+.transaction-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.transaction-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.transaction-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px 25px 15px;
+  border-bottom: 1px solid #ecf0f1;
+}
+
+.transaction-info h3 {
+  margin: 0 0 8px 0;
+  color: #2c3e50;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.transaction-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.transaction-meta span {
+  font-size: 14px;
+  color: #7f8c8d;
+}
+
+.transaction-badges {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.type-badge,
+.status-badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+  text-transform: capitalize;
+  letter-spacing: 0.5px;
+}
+
+.transaction-content {
+  padding: 20px 25px;
+}
+
+.transaction-details {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 25px;
+  margin-bottom: 20px;
+}
+
+.items-summary h4 {
+  margin: 0 0 15px 0;
+  color: #2c3e50;
+  font-size: 16px;
+}
+
+.items-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.item-preview {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  border-left: 3px solid #3498db;
+}
+
+.item-name {
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.item-qty {
+  font-size: 14px;
+  color: #7f8c8d;
+}
+
+.item-price {
+  font-weight: 600;
+  color: #27ae60;
+}
+
+.more-items {
+  text-align: center;
+  padding: 8px;
+  color: #7f8c8d;
+  font-style: italic;
+  font-size: 14px;
+}
+
+.customer-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.customer-info strong {
+  color: #2c3e50;
+}
+
+.customer-phone {
+  font-size: 14px;
+  color: #7f8c8d;
+}
+
+.prescription-ref {
+  font-size: 14px;
+  color: #3498db;
+}
+
+.transaction-summary {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 25px;
+  align-items: flex-end;
+}
+
+.billing-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.billing-line {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+}
+
+.billing-line.total {
+  font-weight: 700;
+  font-size: 16px;
+  color: #2c3e50;
+  padding-top: 8px;
+  border-top: 1px solid #ecf0f1;
+  margin-top: 8px;
+}
+
+.payment-info {
+  display: flex;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.payment-method {
+  padding: 4px 8px;
+  background: #e8f5e8;
+  color: #27ae60;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.balance-due {
+  padding: 4px 8px;
+  background: #ffebee;
+  color: #e74c3c;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.transaction-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-action {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.btn-action.view {
+  background: #3498db;
+  color: white;
+}
+
+.btn-action.view:hover {
+  background: #2980b9;
+}
+
+.btn-action.print {
+  background: #95a5a6;
+  color: white;
+}
+
+.btn-action.print:hover {
+  background: #7f8c8d;
+}
+
+.btn-action.return {
+  background: #e67e22;
+  color: white;
+}
+
+.btn-action.return:hover {
+  background: #d35400;
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 400px;
+  font-size: 18px;
+  color: #7f8c8d;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.modal.large {
+  width: 1000px;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 25px;
+  border-bottom: 1px solid #ecf0f1;
+  background: #f8f9fa;
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 20px;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: #7f8c8d;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-close:hover {
+  color: #2c3e50;
+}
+
+.modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 25px;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 20px 25px;
+  border-top: 1px solid #ecf0f1;
+  background: #f8f9fa;
+}
+
+.transaction-full-details {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.detail-section {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.detail-section h4 {
+  margin: 0 0 15px 0;
+  color: #2c3e50;
+  font-size: 18px;
+  border-bottom: 2px solid #3498db;
+  padding-bottom: 8px;
+}
+
+.detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.detail-item label {
+  font-weight: 600;
+  color: #7f8c8d;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.detail-item span {
+  color: #2c3e50;
+  font-size: 16px;
+}
+
+.items-table {
+  overflow-x: auto;
+}
+
+.items-table table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.items-table th,
+.items-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ecf0f1;
+}
+
+.items-table th {
+  background: #f8f9fa;
+  font-weight: 600;
+  color: #2c3e50;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.5px;
+}
+
+.items-table td {
+  color: #2c3e50;
+}
+
+.brand-name {
+  font-size: 14px;
+  color: #7f8c8d;
+  font-style: italic;
+}
+
+.substitution-note {
+  font-size: 12px;
+  color: #e67e22;
+  background: #fff3e0;
+  padding: 4px 8px;
+  border-radius: 4px;
+  margin-top: 4px;
+}
+
+.billing-details {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  border: 1px solid #ecf0f1;
+}
+
+.billing-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  font-size: 16px;
+}
+
+.billing-row.total {
+  font-weight: 700;
+  font-size: 18px;
+  color: #2c3e50;
+  border-top: 2px solid #3498db;
+  margin-top: 10px;
+  padding-top: 15px;
+}
+
+.billing-row.balance {
+  color: #e74c3c;
+  font-weight: 600;
+}
+
+.payment-method-info {
+  margin-top: 15px;
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.counseling-info p {
+  margin: 10px 0;
+  color: #2c3e50;
+  line-height: 1.6;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .transaction-details {
+    grid-template-columns: 1fr;
+  }
+  
+  .transaction-summary {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .pharmacy-transactions {
+    padding: 15px;
+  }
+  
+  .transactions-header {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+  
+  .header-actions {
+    width: 100%;
+    justify-content: center;
+  }
+  
+  .summary-cards {
+    grid-template-columns: 1fr;
+  }
+  
+  .transaction-filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .transaction-filters select {
+    width: 100%;
+  }
+  
+  .transaction-header {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .transaction-badges {
+    align-items: flex-start;
+    flex-direction: row;
+    gap: 10px;
+  }
+  
+  .transaction-details {
+    grid-template-columns: 1fr;
+  }
+  
+  .transaction-summary {
+    grid-template-columns: 1fr;
+  }
+  
+  .transaction-actions {
+    flex-direction: column;
+  }
+  
+  .transaction-actions .btn-action {
+    width: 100%;
+  }
+  
+  .modal {
+    width: 95vw;
+    height: 95vh;
+  }
+  
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .items-table {
+    font-size: 14px;
+  }
+  
+  .items-table th,
+  .items-table td {
+    padding: 8px;
+  }
+}
