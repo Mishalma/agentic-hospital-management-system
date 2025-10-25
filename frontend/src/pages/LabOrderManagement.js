@@ -1,17 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import './LabOrderManagement.css';
+import React, { useState, useEffect, useCallback } from "react";
+import "./LabOrderManagement.css";
+import LaboratoryDashboard from "../components/LaboratoryDashboard";
 
 const LabOrderManagement = () => {
   const [orders, setOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [filters, setFilters] = useState({
-    status: '',
-    priority: '',
-    patientId: '',
-    startDate: '',
-    endDate: ''
+    status: "",
+    priority: "",
+    patientId: "",
+    startDate: "",
+    endDate: "",
   });
   const [showNewOrderForm, setShowNewOrderForm] = useState(false);
   const [testCatalog, setTestCatalog] = useState([]);
@@ -21,24 +22,50 @@ const LabOrderManagement = () => {
     fetchTestCatalog();
   }, []);
 
+  const applyFilters = useCallback(() => {
+    let filtered = [...orders];
+
+    if (filters.status) {
+      filtered = filtered.filter((order) => order.status === filters.status);
+    }
+
+    if (filters.priority) {
+      filtered = filtered.filter((order) => order.priority === filters.priority);
+    }
+
+    if (filters.patientId) {
+      filtered = filtered.filter((order) => order.patientId.toLowerCase().includes(filters.patientId.toLowerCase()));
+    }
+
+    if (filters.startDate) {
+      filtered = filtered.filter((order) => new Date(order.orderDate) >= new Date(filters.startDate));
+    }
+
+    if (filters.endDate) {
+      filtered = filtered.filter((order) => new Date(order.orderDate) <= new Date(filters.endDate));
+    }
+
+    setFilteredOrders(filtered);
+  }, [orders, filters]);
+
   useEffect(() => {
     applyFilters();
-  }, [orders, filters]);
+  }, [applyFilters]);
 
   const fetchOrders = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/laboratory/orders');
+      const response = await fetch("/api/laboratory/orders");
       const data = await response.json();
-      
+
       if (data.success) {
         setOrders(data.data);
       } else {
-        setError('Failed to fetch lab orders');
+        setError("Failed to fetch lab orders");
       }
     } catch (error) {
-      console.error('Error fetching orders:', error);
-      setError('Failed to fetch lab orders');
+      console.error("Error fetching orders:", error);
+      setError("Failed to fetch lab orders");
     } finally {
       setLoading(false);
     }
@@ -46,102 +73,70 @@ const LabOrderManagement = () => {
 
   const fetchTestCatalog = async () => {
     try {
-      const response = await fetch('/api/laboratory/test-catalog');
+      const response = await fetch("/api/laboratory/test-catalog");
       const data = await response.json();
-      
+
       if (data.success) {
         setTestCatalog(data.data);
       }
     } catch (error) {
-      console.error('Error fetching test catalog:', error);
+      console.error("Error fetching test catalog:", error);
     }
-  };
-
-  const applyFilters = () => {
-    let filtered = [...orders];
-
-    if (filters.status) {
-      filtered = filtered.filter(order => order.status === filters.status);
-    }
-
-    if (filters.priority) {
-      filtered = filtered.filter(order => order.priority === filters.priority);
-    }
-
-    if (filters.patientId) {
-      filtered = filtered.filter(order => 
-        order.patientId.toLowerCase().includes(filters.patientId.toLowerCase())
-      );
-    }
-
-    if (filters.startDate) {
-      filtered = filtered.filter(order => 
-        new Date(order.orderDate) >= new Date(filters.startDate)
-      );
-    }
-
-    if (filters.endDate) {
-      filtered = filtered.filter(order => 
-        new Date(order.orderDate) <= new Date(filters.endDate)
-      );
-    }
-
-    setFilteredOrders(filtered);
   };
 
   const handleFilterChange = (field, value) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
   const updateOrderStatus = async (orderId, newStatus) => {
     try {
       const response = await fetch(`/api/laboratory/orders/${orderId}/status`, {
-        method: 'PUT',
+        method: "PUT",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({ status: newStatus })
+        body: JSON.stringify({ status: newStatus }),
       });
 
       const data = await response.json();
-      
+
       if (data.success) {
         // Update local state
-        setOrders(prev => prev.map(order => 
-          order.orderId === orderId 
-            ? { ...order, status: newStatus, updatedAt: new Date() }
-            : order
-        ));
+        setOrders((prev) =>
+          prev.map((order) =>
+            order.orderId === orderId ? { ...order, status: newStatus, updatedAt: new Date() } : order
+          )
+        );
       } else {
-        setError('Failed to update order status');
+        setError("Failed to update order status");
       }
     } catch (error) {
-      console.error('Error updating order status:', error);
-      setError('Failed to update order status');
+      console.error("Error updating order status:", error);
+      setError("Failed to update order status");
     }
   };
 
   const getStatusColor = (status) => {
     const colors = {
-      'Pending': '#ffc107',
-      'Collected': '#17a2b8',
-      'Processing': '#fd7e14',
-      'Completed': '#28a745',
-      'Cancelled': '#dc3545'
+      Pending: "#ffc107",
+      Collected: "#17a2b8",
+      Processing: "#fd7e14",
+      Completed: "#28a745",
+      Cancelled: "#dc3545",
     };
-    return colors[status] || '#6c757d';
+    return colors[status] || "#6c757d";
   };
 
   const getPriorityColor = (priority) => {
     const colors = {
-      'Routine': '#28a745',
-      'Urgent': '#ffc107',
-      'STAT': '#dc3545'
+      Routine: "#28a745",
+      Urgent: "#ffc107",
+      STAT: "#dc3545",
     };
-    return colors[priority] || '#6c757d';
+    return colors[priority] || "#6c757d";
   };
 
   if (loading) {
@@ -159,29 +154,19 @@ const LabOrderManagement = () => {
     <div className="lab-order-management">
       <div className="page-header">
         <h1>Lab Order Management</h1>
-        <button 
-          className="btn btn-primary"
-          onClick={() => setShowNewOrderForm(true)}
-        >
+        <button className="btn btn-primary" onClick={() => setShowNewOrderForm(true)}>
           + New Lab Order
         </button>
       </div>
 
-      {error && (
-        <div className="alert alert-danger">
-          {error}
-        </div>
-      )}
+      {error && <div className="alert alert-danger">{error}</div>}
 
       {/* Filters */}
       <div className="filters-section">
         <div className="filters-grid">
           <div className="filter-group">
             <label>Status</label>
-            <select 
-              value={filters.status}
-              onChange={(e) => handleFilterChange('status', e.target.value)}
-            >
+            <select value={filters.status} onChange={(e) => handleFilterChange("status", e.target.value)}>
               <option value="">All Statuses</option>
               <option value="Pending">Pending</option>
               <option value="Collected">Collected</option>
@@ -193,10 +178,7 @@ const LabOrderManagement = () => {
 
           <div className="filter-group">
             <label>Priority</label>
-            <select 
-              value={filters.priority}
-              onChange={(e) => handleFilterChange('priority', e.target.value)}
-            >
+            <select value={filters.priority} onChange={(e) => handleFilterChange("priority", e.target.value)}>
               <option value="">All Priorities</option>
               <option value="Routine">Routine</option>
               <option value="Urgent">Urgent</option>
@@ -206,29 +188,29 @@ const LabOrderManagement = () => {
 
           <div className="filter-group">
             <label>Patient ID</label>
-            <input 
+            <input
               type="text"
               value={filters.patientId}
-              onChange={(e) => handleFilterChange('patientId', e.target.value)}
+              onChange={(e) => handleFilterChange("patientId", e.target.value)}
               placeholder="Search by Patient ID"
             />
           </div>
 
           <div className="filter-group">
             <label>Start Date</label>
-            <input 
+            <input
               type="date"
               value={filters.startDate}
-              onChange={(e) => handleFilterChange('startDate', e.target.value)}
+              onChange={(e) => handleFilterChange("startDate", e.target.value)}
             />
           </div>
 
           <div className="filter-group">
             <label>End Date</label>
-            <input 
+            <input
               type="date"
               value={filters.endDate}
-              onChange={(e) => handleFilterChange('endDate', e.target.value)}
+              onChange={(e) => handleFilterChange("endDate", e.target.value)}
             />
           </div>
         </div>
@@ -277,10 +259,7 @@ const LabOrderManagement = () => {
                       </div>
                     </td>
                     <td>
-                      <span 
-                        className="priority-badge"
-                        style={{ backgroundColor: getPriorityColor(order.priority) }}
-                      >
+                      <span className="priority-badge" style={{ backgroundColor: getPriorityColor(order.priority) }}>
                         {order.priority}
                       </span>
                     </td>
@@ -301,24 +280,24 @@ const LabOrderManagement = () => {
                     <td>{new Date(order.orderDate).toLocaleDateString()}</td>
                     <td>
                       <div className="action-buttons">
-                        <button 
+                        <button
                           className="btn btn-sm btn-primary"
-                          onClick={() => window.location.href = `/lab-orders/${order.orderId}`}
+                          onClick={() => (window.location.href = `/lab-orders/${order.orderId}`)}
                         >
                           View
                         </button>
-                        {order.status === 'Pending' && (
-                          <button 
+                        {order.status === "Pending" && (
+                          <button
                             className="btn btn-sm btn-info"
-                            onClick={() => window.location.href = `/sample-collection/${order.orderId}`}
+                            onClick={() => (window.location.href = `/sample-collection/${order.orderId}`)}
                           >
                             Collect
                           </button>
                         )}
-                        {order.status === 'Collected' && (
-                          <button 
+                        {order.status === "Collected" && (
+                          <button
                             className="btn btn-sm btn-warning"
-                            onClick={() => window.location.href = `/result-entry/${order.orderId}`}
+                            onClick={() => (window.location.href = `/result-entry/${order.orderId}`)}
                           >
                             Enter Results
                           </button>
@@ -327,6 +306,7 @@ const LabOrderManagement = () => {
                     </td>
                   </tr>
                 ))}
+                <LaboratoryDashboard />
               </tbody>
             </table>
           </div>
@@ -335,7 +315,7 @@ const LabOrderManagement = () => {
 
       {/* New Order Form Modal */}
       {showNewOrderForm && (
-        <NewOrderModal 
+        <NewOrderModal
           testCatalog={testCatalog}
           onClose={() => setShowNewOrderForm(false)}
           onOrderCreated={fetchOrders}
@@ -348,45 +328,45 @@ const LabOrderManagement = () => {
 // New Order Modal Component
 const NewOrderModal = ({ testCatalog, onClose, onOrderCreated }) => {
   const [formData, setFormData] = useState({
-    patientId: '',
-    doctorId: '',
-    consultationId: '',
-    priority: 'Routine',
+    patientId: "",
+    doctorId: "",
+    consultationId: "",
+    priority: "Routine",
     clinicalInfo: {
-      diagnosis: '',
-      symptoms: '',
-      medications: '',
-      allergies: ''
+      diagnosis: "",
+      symptoms: "",
+      medications: "",
+      allergies: "",
     },
-    selectedTests: []
+    selectedTests: [],
   });
   const [submitting, setSubmitting] = useState(false);
 
   const handleInputChange = (field, value) => {
-    if (field.includes('.')) {
-      const [parent, child] = field.split('.');
-      setFormData(prev => ({
+    if (field.includes(".")) {
+      const [parent, child] = field.split(".");
+      setFormData((prev) => ({
         ...prev,
         [parent]: {
           ...prev[parent],
-          [child]: value
-        }
+          [child]: value,
+        },
       }));
     } else {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        [field]: value
+        [field]: value,
       }));
     }
   };
 
   const handleTestSelection = (test, category) => {
     const testWithCategory = { ...test, category };
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      selectedTests: prev.selectedTests.some(t => t.testCode === test.testCode)
-        ? prev.selectedTests.filter(t => t.testCode !== test.testCode)
-        : [...prev.selectedTests, testWithCategory]
+      selectedTests: prev.selectedTests.some((t) => t.testCode === test.testCode)
+        ? prev.selectedTests.filter((t) => t.testCode !== test.testCode)
+        : [...prev.selectedTests, testWithCategory],
     }));
   };
 
@@ -397,34 +377,34 @@ const NewOrderModal = ({ testCatalog, onClose, onOrderCreated }) => {
     try {
       const orderData = {
         ...formData,
-        tests: formData.selectedTests.map(test => ({
+        tests: formData.selectedTests.map((test) => ({
           testCode: test.testCode,
           testName: test.testName,
           category: test.category,
           specimen: test.specimen,
-          priority: formData.priority
-        }))
+          priority: formData.priority,
+        })),
       };
 
-      const response = await fetch('/api/laboratory/orders', {
-        method: 'POST',
+      const response = await fetch("/api/laboratory/orders", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify(orderData)
+        body: JSON.stringify(orderData),
       });
 
       const data = await response.json();
-      
+
       if (data.success) {
         onOrderCreated();
         onClose();
       } else {
-        alert('Failed to create lab order: ' + data.message);
+        alert("Failed to create lab order: " + data.message);
       }
     } catch (error) {
-      console.error('Error creating order:', error);
-      alert('Failed to create lab order');
+      console.error("Error creating order:", error);
+      alert("Failed to create lab order");
     } finally {
       setSubmitting(false);
     }
@@ -435,46 +415,45 @@ const NewOrderModal = ({ testCatalog, onClose, onOrderCreated }) => {
       <div className="modal-content">
         <div className="modal-header">
           <h2>New Lab Order</h2>
-          <button className="close-btn" onClick={onClose}>×</button>
+          <button className="close-btn" onClick={onClose}>
+            ×
+          </button>
         </div>
 
         <form onSubmit={handleSubmit} className="order-form">
           <div className="form-grid">
             <div className="form-group">
               <label>Patient ID *</label>
-              <input 
+              <input
                 type="text"
                 value={formData.patientId}
-                onChange={(e) => handleInputChange('patientId', e.target.value)}
+                onChange={(e) => handleInputChange("patientId", e.target.value)}
                 required
               />
             </div>
 
             <div className="form-group">
               <label>Doctor ID *</label>
-              <input 
+              <input
                 type="text"
                 value={formData.doctorId}
-                onChange={(e) => handleInputChange('doctorId', e.target.value)}
+                onChange={(e) => handleInputChange("doctorId", e.target.value)}
                 required
               />
             </div>
 
             <div className="form-group">
               <label>Consultation ID</label>
-              <input 
+              <input
                 type="text"
                 value={formData.consultationId}
-                onChange={(e) => handleInputChange('consultationId', e.target.value)}
+                onChange={(e) => handleInputChange("consultationId", e.target.value)}
               />
             </div>
 
             <div className="form-group">
               <label>Priority</label>
-              <select 
-                value={formData.priority}
-                onChange={(e) => handleInputChange('priority', e.target.value)}
-              >
+              <select value={formData.priority} onChange={(e) => handleInputChange("priority", e.target.value)}>
                 <option value="Routine">Routine</option>
                 <option value="Urgent">Urgent</option>
                 <option value="STAT">STAT</option>
@@ -487,37 +466,37 @@ const NewOrderModal = ({ testCatalog, onClose, onOrderCreated }) => {
             <div className="form-grid">
               <div className="form-group">
                 <label>Diagnosis</label>
-                <input 
+                <input
                   type="text"
                   value={formData.clinicalInfo.diagnosis}
-                  onChange={(e) => handleInputChange('clinicalInfo.diagnosis', e.target.value)}
+                  onChange={(e) => handleInputChange("clinicalInfo.diagnosis", e.target.value)}
                 />
               </div>
 
               <div className="form-group">
                 <label>Symptoms</label>
-                <input 
+                <input
                   type="text"
                   value={formData.clinicalInfo.symptoms}
-                  onChange={(e) => handleInputChange('clinicalInfo.symptoms', e.target.value)}
+                  onChange={(e) => handleInputChange("clinicalInfo.symptoms", e.target.value)}
                 />
               </div>
 
               <div className="form-group">
                 <label>Current Medications</label>
-                <input 
+                <input
                   type="text"
                   value={formData.clinicalInfo.medications}
-                  onChange={(e) => handleInputChange('clinicalInfo.medications', e.target.value)}
+                  onChange={(e) => handleInputChange("clinicalInfo.medications", e.target.value)}
                 />
               </div>
 
               <div className="form-group">
                 <label>Allergies</label>
-                <input 
+                <input
                   type="text"
                   value={formData.clinicalInfo.allergies}
-                  onChange={(e) => handleInputChange('clinicalInfo.allergies', e.target.value)}
+                  onChange={(e) => handleInputChange("clinicalInfo.allergies", e.target.value)}
                 />
               </div>
             </div>
@@ -530,9 +509,11 @@ const NewOrderModal = ({ testCatalog, onClose, onOrderCreated }) => {
                 <h5>{category.category}</h5>
                 <div className="tests-grid">
                   {category.tests.map((test) => (
-                    <div 
+                    <div
                       key={test.testCode}
-                      className={`test-item ${formData.selectedTests.some(t => t.testCode === test.testCode) ? 'selected' : ''}`}
+                      className={`test-item ${
+                        formData.selectedTests.some((t) => t.testCode === test.testCode) ? "selected" : ""
+                      }`}
                       onClick={() => handleTestSelection(test, category.category)}
                     >
                       <div className="test-info">
@@ -552,12 +533,12 @@ const NewOrderModal = ({ testCatalog, onClose, onOrderCreated }) => {
             <button type="button" className="btn btn-secondary" onClick={onClose}>
               Cancel
             </button>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="btn btn-primary"
               disabled={submitting || formData.selectedTests.length === 0}
             >
-              {submitting ? 'Creating...' : 'Create Order'}
+              {submitting ? "Creating..." : "Create Order"}
             </button>
           </div>
         </form>

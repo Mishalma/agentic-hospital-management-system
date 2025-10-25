@@ -1,40 +1,42 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useAuth } from '../contexts/AuthContext';
-import { useParams, useNavigate } from 'react-router-dom';
-import DoctorChatbot from '../components/AIAssistant/DoctorChatbot';
-import './ConsultationForm.css';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { useAuth } from "../contexts/AuthContext";
+import { usePatient } from "../contexts/PatientContext";
+import { useParams, useNavigate } from "react-router-dom";
+import DoctorChatbot from "../components/AIAssistant/DoctorChatbot";
+import "./ConsultationForm.css";
 
 const ConsultationForm = () => {
   const { user } = useAuth();
+  const { currentPatientId, setCurrentPatientId } = usePatient();
   const { id } = useParams();
   const navigate = useNavigate();
   const isEditing = Boolean(id);
 
   const [formData, setFormData] = useState({
-    patientId: '',
-    chiefComplaint: '',
-    historyOfPresentIllness: '',
-    pastMedicalHistory: '',
+    patientId: currentPatientId || "",
+    chiefComplaint: "",
+    historyOfPresentIllness: "",
+    pastMedicalHistory: "",
     medications: [],
     allergies: [],
     vitals: {
-      bloodPressure: { systolic: '', diastolic: '' },
-      heartRate: '',
-      temperature: '',
-      respiratoryRate: '',
-      oxygenSaturation: '',
-      weight: '',
-      height: ''
+      bloodPressure: { systolic: "", diastolic: "" },
+      heartRate: "",
+      temperature: "",
+      respiratoryRate: "",
+      oxygenSaturation: "",
+      weight: "",
+      height: "",
     },
     symptoms: [],
     assessment: {
-      primaryDiagnosis: '',
+      primaryDiagnosis: "",
       differentialDiagnosis: [],
-      clinicalNotes: ''
+      clinicalNotes: "",
     },
     investigations: [],
-    consultationType: 'initial'
+    consultationType: "initial",
   });
 
   const [aiSuggestions, setAiSuggestions] = useState(null);
@@ -58,30 +60,32 @@ const ConsultationForm = () => {
         setAiSuggestions(response.data.data.aiSuggestions.response);
       }
     } catch (error) {
-      console.error('Error fetching consultation:', error);
+      console.error("Error fetching consultation:", error);
     }
   };
 
   const handleInputChange = (field, value) => {
-    if (field.includes('.')) {
-      const [parent, child] = field.split('.');
-      setFormData(prev => ({
+    if (field.includes(".")) {
+      const [parent, child] = field.split(".");
+      setFormData((prev) => ({
         ...prev,
         [parent]: {
           ...prev[parent],
-          [child]: value
-        }
+          [child]: value,
+        },
       }));
     } else {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
-        [field]: value
+        [field]: value,
       }));
     }
 
-    // Auto-load patient history when patientId changes
-    if (field === 'patientId' && value.trim()) {
+    // Auto-load patient history and vitals when patientId changes
+    if (field === "patientId" && value.trim()) {
+      setCurrentPatientId(value.trim());
       fetchPatientHistory(value.trim());
+      fetchLatestVitals(value.trim());
     }
   };
 
@@ -96,22 +100,23 @@ const ConsultationForm = () => {
 
         // Auto-populate form with patient data
         if (response.data.data.patient) {
-          setFormData(prev => ({
+          setFormData((prev) => ({
             ...prev,
             // Pre-fill allergies if available
             allergies: response.data.data.patient.allergies || prev.allergies,
             // Pre-fill medications if available
-            medications: response.data.data.currentMedications?.map(med => ({
-              name: med.genericName || med.name,
-              dosage: med.dosage || '',
-              frequency: med.frequency || '',
-              status: 'active'
-            })) || prev.medications
+            medications:
+              response.data.data.currentMedications?.map((med) => ({
+                name: med.genericName || med.name,
+                dosage: med.dosage || "",
+                frequency: med.frequency || "",
+                status: "active",
+              })) || prev.medications,
           }));
         }
       }
     } catch (error) {
-      console.error('Error fetching patient history:', error);
+      console.error("Error fetching patient history:", error);
       // Don't show error for missing patients, just clear history
       if (error.response?.status === 404) {
         setPatientHistory(null);
@@ -121,117 +126,146 @@ const ConsultationForm = () => {
     }
   };
 
+  const fetchLatestVitals = async (patientId) => {
+    try {
+      const response = await axios.get(`/api/vitals/latest/${patientId}`);
+      if (response.data.success && response.data.data) {
+        const latestVitals = response.data.data;
+        setFormData((prev) => ({
+          ...prev,
+          vitals: {
+            bloodPressure: {
+              systolic: latestVitals.vitals.bloodPressure?.systolic || "",
+              diastolic: latestVitals.vitals.bloodPressure?.diastolic || "",
+            },
+            heartRate: latestVitals.vitals.heartRate || "",
+            temperature: latestVitals.vitals.temperature?.value || "",
+            respiratoryRate: latestVitals.vitals.respiratoryRate || "",
+            oxygenSaturation: latestVitals.vitals.oxygenSaturation || "",
+            weight: prev.vitals.weight, // Keep existing weight since it's not in vitals
+            height: prev.vitals.height, // Keep existing height since it's not in vitals
+          },
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching latest vitals:", error);
+    }
+  };
+
   const handleVitalsChange = (field, value) => {
-    if (field === 'bloodPressure') {
-      const [type, val] = value.split(':');
-      setFormData(prev => ({
+    if (field === "bloodPressure") {
+      const [type, val] = value.split(":");
+      setFormData((prev) => ({
         ...prev,
         vitals: {
           ...prev.vitals,
           bloodPressure: {
             ...prev.vitals.bloodPressure,
-            [type]: val
-          }
-        }
+            [type]: val,
+          },
+        },
       }));
     } else {
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         vitals: {
           ...prev.vitals,
-          [field]: value
-        }
+          [field]: value,
+        },
       }));
     }
   };
 
   const addSymptom = () => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      symptoms: [...prev.symptoms, {
-        symptom: '',
-        severity: 5,
-        duration: '',
-        onset: '',
-        character: ''
-      }]
+      symptoms: [
+        ...prev.symptoms,
+        {
+          symptom: "",
+          severity: 5,
+          duration: "",
+          onset: "",
+          character: "",
+        },
+      ],
     }));
   };
 
   const updateSymptom = (index, field, value) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      symptoms: prev.symptoms.map((symptom, i) => 
-        i === index ? { ...symptom, [field]: value } : symptom
-      )
+      symptoms: prev.symptoms.map((symptom, i) => (i === index ? { ...symptom, [field]: value } : symptom)),
     }));
   };
 
   const removeSymptom = (index) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      symptoms: prev.symptoms.filter((_, i) => i !== index)
+      symptoms: prev.symptoms.filter((_, i) => i !== index),
     }));
   };
 
   const addMedication = () => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      medications: [...prev.medications, {
-        name: '',
-        dosage: '',
-        frequency: '',
-        status: 'active'
-      }]
+      medications: [
+        ...prev.medications,
+        {
+          name: "",
+          dosage: "",
+          frequency: "",
+          status: "active",
+        },
+      ],
     }));
   };
 
   const updateMedication = (index, field, value) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      medications: prev.medications.map((med, i) => 
-        i === index ? { ...med, [field]: value } : med
-      )
+      medications: prev.medications.map((med, i) => (i === index ? { ...med, [field]: value } : med)),
     }));
   };
 
   const removeMedication = (index) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      medications: prev.medications.filter((_, i) => i !== index)
+      medications: prev.medications.filter((_, i) => i !== index),
     }));
   };
 
   const addAllergy = () => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      allergies: [...prev.allergies, {
-        allergen: '',
-        reaction: '',
-        severity: 'mild'
-      }]
+      allergies: [
+        ...prev.allergies,
+        {
+          allergen: "",
+          reaction: "",
+          severity: "mild",
+        },
+      ],
     }));
   };
 
   const updateAllergy = (index, field, value) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      allergies: prev.allergies.map((allergy, i) => 
-        i === index ? { ...allergy, [field]: value } : allergy
-      )
+      allergies: prev.allergies.map((allergy, i) => (i === index ? { ...allergy, [field]: value } : allergy)),
     }));
   };
 
   const removeAllergy = (index) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      allergies: prev.allergies.filter((_, i) => i !== index)
+      allergies: prev.allergies.filter((_, i) => i !== index),
     }));
   };
 
   const getAISuggestions = async () => {
     if (!formData.chiefComplaint) {
-      alert('Please enter chief complaint to get AI suggestions.');
+      alert("Please enter chief complaint to get AI suggestions.");
       return;
     }
 
@@ -243,19 +277,20 @@ const ConsultationForm = () => {
         const tempConsultation = {
           ...formData,
           doctorId: user.id,
-          consultationDate: new Date()
+          consultationDate: new Date(),
         };
-        const tempResponse = await axios.post('/api/consultations', tempConsultation);
+        const tempResponse = await axios.post("/api/consultations", tempConsultation);
         consultationId = tempResponse.data.data.id;
       }
 
       const requestData = {
-        symptoms: formData.symptoms.length > 0 ? formData.symptoms : [{ symptom: formData.chiefComplaint, severity: 5 }],
+        symptoms:
+          formData.symptoms.length > 0 ? formData.symptoms : [{ symptom: formData.chiefComplaint, severity: 5 }],
         vitals: formData.vitals,
         patientHistory: formData.pastMedicalHistory,
         chiefComplaint: formData.chiefComplaint,
-        age: formData.patientAge || 'Adult',
-        gender: formData.patientGender || 'Not specified'
+        age: formData.patientAge || "Adult",
+        gender: formData.patientGender || "Not specified",
       };
 
       const response = await axios.post(`/api/consultations/${consultationId}/ai-suggestions`, requestData);
@@ -267,7 +302,7 @@ const ConsultationForm = () => {
         setAiSuggestions(getFallbackSuggestions(formData.chiefComplaint));
       }
     } catch (error) {
-      console.error('Error getting AI suggestions:', error);
+      console.error("Error getting AI suggestions:", error);
       // Provide fallback suggestions instead of just showing error
       setAiSuggestions(getFallbackSuggestions(formData.chiefComplaint));
     } finally {
@@ -277,71 +312,71 @@ const ConsultationForm = () => {
 
   const getFallbackSuggestions = (chiefComplaint) => {
     const complaint = chiefComplaint.toLowerCase();
-    
-    if (complaint.includes('chest pain') || complaint.includes('chest')) {
+
+    if (complaint.includes("chest pain") || complaint.includes("chest")) {
       return {
         differentialDiagnosis: [
-          { diagnosis: 'Angina pectoris', likelihood: 'medium', reasoning: 'Chest pain with possible cardiac origin' },
-          { diagnosis: 'Musculoskeletal pain', likelihood: 'medium', reasoning: 'Non-cardiac chest pain' },
-          { diagnosis: 'GERD', likelihood: 'low', reasoning: 'Gastroesophageal reflux' }
+          { diagnosis: "Angina pectoris", likelihood: "medium", reasoning: "Chest pain with possible cardiac origin" },
+          { diagnosis: "Musculoskeletal pain", likelihood: "medium", reasoning: "Non-cardiac chest pain" },
+          { diagnosis: "GERD", likelihood: "low", reasoning: "Gastroesophageal reflux" },
         ],
         investigations: [
-          { test: 'ECG', priority: 'urgent', reasoning: 'Rule out cardiac causes' },
-          { test: 'Chest X-ray', priority: 'routine', reasoning: 'Evaluate chest structures' }
+          { test: "ECG", priority: "urgent", reasoning: "Rule out cardiac causes" },
+          { test: "Chest X-ray", priority: "routine", reasoning: "Evaluate chest structures" },
         ],
         treatment: {
-          immediate: 'Monitor vital signs, provide reassurance',
-          medications: 'Consider nitroglycerin if cardiac suspected',
-          nonPharmacological: 'Rest, avoid exertion'
+          immediate: "Monitor vital signs, provide reassurance",
+          medications: "Consider nitroglycerin if cardiac suspected",
+          nonPharmacological: "Rest, avoid exertion",
         },
-        redFlags: ['Severe chest pain', 'Shortness of breath', 'Syncope'],
+        redFlags: ["Severe chest pain", "Shortness of breath", "Syncope"],
         followUp: {
-          timeframe: '24-48 hours or sooner if symptoms worsen',
-          instructions: 'Return immediately if chest pain worsens'
+          timeframe: "24-48 hours or sooner if symptoms worsen",
+          instructions: "Return immediately if chest pain worsens",
         },
-        confidence: 60
+        confidence: 60,
       };
-    } else if (complaint.includes('fever') || complaint.includes('temperature')) {
+    } else if (complaint.includes("fever") || complaint.includes("temperature")) {
       return {
         differentialDiagnosis: [
-          { diagnosis: 'Viral infection', likelihood: 'high', reasoning: 'Most common cause of fever' },
-          { diagnosis: 'Bacterial infection', likelihood: 'medium', reasoning: 'Requires antibiotic treatment' }
+          { diagnosis: "Viral infection", likelihood: "high", reasoning: "Most common cause of fever" },
+          { diagnosis: "Bacterial infection", likelihood: "medium", reasoning: "Requires antibiotic treatment" },
         ],
         investigations: [
-          { test: 'Complete Blood Count', priority: 'routine', reasoning: 'Assess infection markers' },
-          { test: 'Blood cultures', priority: 'urgent', reasoning: 'If high fever or sepsis suspected' }
+          { test: "Complete Blood Count", priority: "routine", reasoning: "Assess infection markers" },
+          { test: "Blood cultures", priority: "urgent", reasoning: "If high fever or sepsis suspected" },
         ],
         treatment: {
-          immediate: 'Symptomatic treatment, hydration',
-          medications: 'Acetaminophen or ibuprofen for fever',
-          nonPharmacological: 'Rest, increased fluid intake'
+          immediate: "Symptomatic treatment, hydration",
+          medications: "Acetaminophen or ibuprofen for fever",
+          nonPharmacological: "Rest, increased fluid intake",
         },
-        redFlags: ['High fever >101.5°F', 'Severe headache', 'Difficulty breathing'],
+        redFlags: ["High fever >101.5°F", "Severe headache", "Difficulty breathing"],
         followUp: {
-          timeframe: '2-3 days if no improvement',
-          instructions: 'Monitor temperature, return if worsening'
+          timeframe: "2-3 days if no improvement",
+          instructions: "Monitor temperature, return if worsening",
         },
-        confidence: 70
+        confidence: 70,
       };
     } else {
       return {
         differentialDiagnosis: [
-          { diagnosis: 'Clinical evaluation needed', likelihood: 'unknown', reasoning: 'Requires detailed assessment' }
+          { diagnosis: "Clinical evaluation needed", likelihood: "unknown", reasoning: "Requires detailed assessment" },
         ],
         investigations: [
-          { test: 'Complete history and physical examination', priority: 'routine', reasoning: 'Standard evaluation' }
+          { test: "Complete history and physical examination", priority: "routine", reasoning: "Standard evaluation" },
         ],
         treatment: {
-          immediate: 'Symptomatic care as appropriate',
-          medications: 'Based on clinical findings',
-          nonPharmacological: 'Supportive care'
+          immediate: "Symptomatic care as appropriate",
+          medications: "Based on clinical findings",
+          nonPharmacological: "Supportive care",
         },
-        redFlags: ['Worsening symptoms', 'New concerning symptoms'],
+        redFlags: ["Worsening symptoms", "New concerning symptoms"],
         followUp: {
-          timeframe: 'As clinically indicated',
-          instructions: 'Follow up if symptoms persist or worsen'
+          timeframe: "As clinically indicated",
+          instructions: "Follow up if symptoms persist or worsen",
         },
-        confidence: 40
+        confidence: 40,
       };
     }
   };
@@ -354,23 +389,26 @@ const ConsultationForm = () => {
       const consultationData = {
         ...formData,
         doctorId: user.id,
-        consultationDate: new Date()
+        consultationDate: new Date(),
       };
 
       let response;
       if (isEditing) {
+        // For editing, we need to use the existing consultation ID
         response = await axios.put(`/api/consultations/${id}`, consultationData);
       } else {
-        response = await axios.post('/api/consultations', consultationData);
+        // For new consultations, create without ID
+        response = await axios.post("/api/consultations", consultationData);
       }
 
       if (response.data.success) {
-        alert(`Consultation ${isEditing ? 'updated' : 'created'} successfully!`);
-        navigate('/consultations');
+        alert(`Consultation ${isEditing ? "updated" : "created"} successfully!`);
+        navigate("/consultations");
       }
     } catch (error) {
-      console.error('Error saving consultation:', error);
-      alert('Error saving consultation. Please try again.');
+      console.error("Error saving consultation:", error);
+      console.error("Error details:", error.response?.data);
+      alert(`Error saving consultation: ${error.response?.data?.message || "Please try again."}`);
     } finally {
       setSaving(false);
     }
@@ -379,15 +417,10 @@ const ConsultationForm = () => {
   return (
     <div className="consultation-form">
       <div className="form-header">
-        <h1>{isEditing ? 'Edit Consultation' : 'New Consultation'}</h1>
+        <h1>{isEditing ? "Edit Consultation" : "New Consultation"}</h1>
         <div className="form-actions">
-          <button 
-            type="button" 
-            className="btn-ai" 
-            onClick={getAISuggestions}
-            disabled={loadingAI}
-          >
-            {loadingAI ? '🤖 Getting AI Suggestions...' : '🤖 Get AI Suggestions'}
+          <button type="button" className="btn-ai" onClick={getAISuggestions} disabled={loadingAI}>
+            {loadingAI ? "🤖 Getting AI Suggestions..." : "🤖 Get AI Suggestions"}
           </button>
         </div>
       </div>
@@ -397,14 +430,14 @@ const ConsultationForm = () => {
           {/* Basic Information */}
           <div className="form-section">
             <h3>Basic Information</h3>
-            
+
             <div className="form-group">
               <label>Patient ID *</label>
               <div className="patient-id-input">
                 <input
                   type="text"
                   value={formData.patientId}
-                  onChange={(e) => handleInputChange('patientId', e.target.value)}
+                  onChange={(e) => handleInputChange("patientId", e.target.value)}
                   required
                   placeholder="Enter Patient ID"
                 />
@@ -412,7 +445,7 @@ const ConsultationForm = () => {
                   <button
                     type="button"
                     className="btn-medical-history"
-                    onClick={() => window.open(`/medical-history/${formData.patientId}`, '_blank')}
+                    onClick={() => window.open(`/medical-history/${formData.patientId}`, "_blank")}
                     title="View/Edit Medical History"
                   >
                     🩺 Medical History
@@ -425,7 +458,7 @@ const ConsultationForm = () => {
               <label>Chief Complaint *</label>
               <textarea
                 value={formData.chiefComplaint}
-                onChange={(e) => handleInputChange('chiefComplaint', e.target.value)}
+                onChange={(e) => handleInputChange("chiefComplaint", e.target.value)}
                 required
                 placeholder="Patient's main concern or reason for visit"
                 rows="3"
@@ -436,7 +469,7 @@ const ConsultationForm = () => {
               <label>Consultation Type</label>
               <select
                 value={formData.consultationType}
-                onChange={(e) => handleInputChange('consultationType', e.target.value)}
+                onChange={(e) => handleInputChange("consultationType", e.target.value)}
               >
                 <option value="initial">Initial</option>
                 <option value="follow-up">Follow-up</option>
@@ -449,12 +482,12 @@ const ConsultationForm = () => {
           {/* History */}
           <div className="form-section">
             <h3>History</h3>
-            
+
             <div className="form-group">
               <label>History of Present Illness</label>
               <textarea
                 value={formData.historyOfPresentIllness}
-                onChange={(e) => handleInputChange('historyOfPresentIllness', e.target.value)}
+                onChange={(e) => handleInputChange("historyOfPresentIllness", e.target.value)}
                 placeholder="Detailed description of current illness"
                 rows="4"
               />
@@ -464,7 +497,7 @@ const ConsultationForm = () => {
               <label>Past Medical History</label>
               <textarea
                 value={formData.pastMedicalHistory}
-                onChange={(e) => handleInputChange('pastMedicalHistory', e.target.value)}
+                onChange={(e) => handleInputChange("pastMedicalHistory", e.target.value)}
                 placeholder="Previous medical conditions, surgeries, etc."
                 rows="3"
               />
@@ -474,7 +507,7 @@ const ConsultationForm = () => {
           {/* Vital Signs */}
           <div className="form-section">
             <h3>Vital Signs</h3>
-            
+
             <div className="vitals-grid">
               <div className="form-group">
                 <label>Blood Pressure</label>
@@ -483,14 +516,14 @@ const ConsultationForm = () => {
                     type="number"
                     placeholder="Systolic"
                     value={formData.vitals.bloodPressure.systolic}
-                    onChange={(e) => handleVitalsChange('bloodPressure', `systolic:${e.target.value}`)}
+                    onChange={(e) => handleVitalsChange("bloodPressure", `systolic:${e.target.value}`)}
                   />
                   <span>/</span>
                   <input
                     type="number"
                     placeholder="Diastolic"
                     value={formData.vitals.bloodPressure.diastolic}
-                    onChange={(e) => handleVitalsChange('bloodPressure', `diastolic:${e.target.value}`)}
+                    onChange={(e) => handleVitalsChange("bloodPressure", `diastolic:${e.target.value}`)}
                   />
                 </div>
               </div>
@@ -500,7 +533,7 @@ const ConsultationForm = () => {
                 <input
                   type="number"
                   value={formData.vitals.heartRate}
-                  onChange={(e) => handleVitalsChange('heartRate', e.target.value)}
+                  onChange={(e) => handleVitalsChange("heartRate", e.target.value)}
                 />
               </div>
 
@@ -510,7 +543,7 @@ const ConsultationForm = () => {
                   type="number"
                   step="0.1"
                   value={formData.vitals.temperature}
-                  onChange={(e) => handleVitalsChange('temperature', e.target.value)}
+                  onChange={(e) => handleVitalsChange("temperature", e.target.value)}
                 />
               </div>
 
@@ -519,7 +552,7 @@ const ConsultationForm = () => {
                 <input
                   type="number"
                   value={formData.vitals.respiratoryRate}
-                  onChange={(e) => handleVitalsChange('respiratoryRate', e.target.value)}
+                  onChange={(e) => handleVitalsChange("respiratoryRate", e.target.value)}
                 />
               </div>
 
@@ -528,7 +561,7 @@ const ConsultationForm = () => {
                 <input
                   type="number"
                   value={formData.vitals.oxygenSaturation}
-                  onChange={(e) => handleVitalsChange('oxygenSaturation', e.target.value)}
+                  onChange={(e) => handleVitalsChange("oxygenSaturation", e.target.value)}
                 />
               </div>
 
@@ -537,7 +570,7 @@ const ConsultationForm = () => {
                 <input
                   type="number"
                   value={formData.vitals.weight}
-                  onChange={(e) => handleVitalsChange('weight', e.target.value)}
+                  onChange={(e) => handleVitalsChange("weight", e.target.value)}
                 />
               </div>
             </div>
@@ -560,9 +593,9 @@ const ConsultationForm = () => {
                   type="text"
                   placeholder="Symptom"
                   value={symptom.symptom}
-                  onChange={(e) => updateSymptom(index, 'symptom', e.target.value)}
+                  onChange={(e) => updateSymptom(index, "symptom", e.target.value)}
                 />
-                
+
                 <div className="severity-input">
                   <label>Severity: {symptom.severity}/10</label>
                   <input
@@ -570,29 +603,25 @@ const ConsultationForm = () => {
                     min="1"
                     max="10"
                     value={symptom.severity}
-                    onChange={(e) => updateSymptom(index, 'severity', parseInt(e.target.value))}
+                    onChange={(e) => updateSymptom(index, "severity", parseInt(e.target.value))}
                   />
                 </div>
-                
+
                 <input
                   type="text"
                   placeholder="Duration"
                   value={symptom.duration}
-                  onChange={(e) => updateSymptom(index, 'duration', e.target.value)}
+                  onChange={(e) => updateSymptom(index, "duration", e.target.value)}
                 />
-                
+
                 <input
                   type="text"
                   placeholder="Character"
                   value={symptom.character}
-                  onChange={(e) => updateSymptom(index, 'character', e.target.value)}
+                  onChange={(e) => updateSymptom(index, "character", e.target.value)}
                 />
-                
-                <button 
-                  type="button" 
-                  className="btn-remove"
-                  onClick={() => removeSymptom(index)}
-                >
+
+                <button type="button" className="btn-remove" onClick={() => removeSymptom(index)}>
                   Remove
                 </button>
               </div>
@@ -608,8 +637,15 @@ const ConsultationForm = () => {
             {patientHistory.patient && (
               <div className="patient-info">
                 <h4>Patient Info</h4>
-                <p><strong>Name:</strong> {patientHistory.patient.name || 'Not available'}</p>
-                <p><strong>Age:</strong> {patientHistory.patient.dob ? new Date().getFullYear() - new Date(patientHistory.patient.dob).getFullYear() : 'N/A'}</p>
+                <p>
+                  <strong>Name:</strong> {patientHistory.patient.name || "Not available"}
+                </p>
+                <p>
+                  <strong>Age:</strong>{" "}
+                  {patientHistory.patient.dob
+                    ? new Date().getFullYear() - new Date(patientHistory.patient.dob).getFullYear()
+                    : "N/A"}
+                </p>
               </div>
             )}
 
@@ -618,9 +654,19 @@ const ConsultationForm = () => {
                 <h4>Medical History</h4>
                 {patientHistory.medicalHistory.map((history, index) => (
                   <div key={index} className="history-item">
-                    <small><strong>{history.condition}</strong> ({history.status || 'active'})</small>
-                    <p>{history.diagnosedDate ? new Date(history.diagnosedDate).toLocaleDateString() : 'Date not available'}</p>
-                    {history.notes && <p><em>{history.notes}</em></p>}
+                    <small>
+                      <strong>{history.condition}</strong> ({history.status || "active"})
+                    </small>
+                    <p>
+                      {history.diagnosedDate
+                        ? new Date(history.diagnosedDate).toLocaleDateString()
+                        : "Date not available"}
+                    </p>
+                    {history.notes && (
+                      <p>
+                        <em>{history.notes}</em>
+                      </p>
+                    )}
                   </div>
                 ))}
               </div>
@@ -632,7 +678,10 @@ const ConsultationForm = () => {
                 {patientHistory.recentVitals.slice(0, 3).map((vital, index) => (
                   <div key={index} className="vital-summary">
                     <small>{new Date(vital.createdAt || vital.recordedAt).toLocaleDateString()}</small>
-                    <p>BP: {vital.vitals?.bloodPressure?.systolic || 'N/A'}/{vital.vitals?.bloodPressure?.diastolic || 'N/A'}, HR: {vital.vitals?.heartRate || 'N/A'}</p>
+                    <p>
+                      BP: {vital.vitals?.bloodPressure?.systolic || "N/A"}/
+                      {vital.vitals?.bloodPressure?.diastolic || "N/A"}, HR: {vital.vitals?.heartRate || "N/A"}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -656,7 +705,9 @@ const ConsultationForm = () => {
                 {patientHistory.currentMedications.slice(0, 3).map((med, index) => (
                   <div key={index} className="medication-summary">
                     <small>{med.genericName || med.name}</small>
-                    <p>{med.dosage} {med.frequency}</p>
+                    <p>
+                      {med.dosage} {med.frequency}
+                    </p>
                   </div>
                 ))}
               </div>
@@ -679,18 +730,22 @@ const ConsultationForm = () => {
               {aiSuggestions.differentialDiagnosis && (
                 <div className="suggestion-item">
                   <h4>Differential Diagnosis:</h4>
-                  <p>{Array.isArray(aiSuggestions.differentialDiagnosis)
-                    ? aiSuggestions.differentialDiagnosis.join(', ')
-                    : aiSuggestions.differentialDiagnosis}</p>
+                  <p>
+                    {Array.isArray(aiSuggestions.differentialDiagnosis)
+                      ? aiSuggestions.differentialDiagnosis.join(", ")
+                      : aiSuggestions.differentialDiagnosis}
+                  </p>
                 </div>
               )}
 
               {aiSuggestions.investigations && (
                 <div className="suggestion-item">
                   <h4>Recommended Investigations:</h4>
-                  <p>{Array.isArray(aiSuggestions.investigations)
-                    ? aiSuggestions.investigations.join(', ')
-                    : aiSuggestions.investigations}</p>
+                  <p>
+                    {Array.isArray(aiSuggestions.investigations)
+                      ? aiSuggestions.investigations.join(", ")
+                      : aiSuggestions.investigations}
+                  </p>
                 </div>
               )}
 
@@ -704,9 +759,9 @@ const ConsultationForm = () => {
               {aiSuggestions.redFlags && (
                 <div className="suggestion-item warning">
                   <h4>⚠️ Red Flags:</h4>
-                  <p>{Array.isArray(aiSuggestions.redFlags)
-                    ? aiSuggestions.redFlags.join(', ')
-                    : aiSuggestions.redFlags}</p>
+                  <p>
+                    {Array.isArray(aiSuggestions.redFlags) ? aiSuggestions.redFlags.join(", ") : aiSuggestions.redFlags}
+                  </p>
                 </div>
               )}
             </div>
@@ -716,13 +771,13 @@ const ConsultationForm = () => {
         {/* Assessment */}
         <div className="form-section full-width">
           <h3>Assessment</h3>
-          
+
           <div className="form-group">
             <label>Primary Diagnosis</label>
             <input
               type="text"
               value={formData.assessment.primaryDiagnosis}
-              onChange={(e) => handleInputChange('assessment.primaryDiagnosis', e.target.value)}
+              onChange={(e) => handleInputChange("assessment.primaryDiagnosis", e.target.value)}
               placeholder="Primary diagnosis"
             />
           </div>
@@ -731,7 +786,7 @@ const ConsultationForm = () => {
             <label>Clinical Notes</label>
             <textarea
               value={formData.assessment.clinicalNotes}
-              onChange={(e) => handleInputChange('assessment.clinicalNotes', e.target.value)}
+              onChange={(e) => handleInputChange("assessment.clinicalNotes", e.target.value)}
               placeholder="Additional clinical notes and observations"
               rows="4"
             />
@@ -740,46 +795,35 @@ const ConsultationForm = () => {
 
         {/* Form Actions */}
         <div className="form-actions-bottom">
-           <div className="form-actions-left">
-             <button
-               type="button"
-               className="btn-medical-history-nav"
-               onClick={() => {
-                 const patientId = formData.patientId || prompt('Enter Patient ID:');
-                 if (patientId) {
-                   navigate(`/medical-history/${patientId}`);
-                 }
-               }}
-             >
-               🩺 Medical History
-             </button>
-           </div>
+          <div className="form-actions-left">
+            <button
+              type="button"
+              className="btn-medical-history-nav"
+              onClick={() => {
+                const patientId = formData.patientId || prompt("Enter Patient ID:");
+                if (patientId) {
+                  navigate(`/medical-history/${patientId}`);
+                }
+              }}
+            >
+              🩺 Medical History
+            </button>
+          </div>
 
-           <div className="form-actions-right">
-             <button
-               type="button"
-               className="btn-cancel"
-               onClick={() => navigate('/consultations')}
-             >
-               Cancel
-             </button>
+          <div className="form-actions-right">
+            <button type="button" className="btn-cancel" onClick={() => navigate("/consultations")}>
+              Cancel
+            </button>
 
-             <button
-               type="submit"
-               className="btn-save"
-               disabled={saving}
-             >
-               {saving ? 'Saving...' : (isEditing ? 'Update Consultation' : 'Save Consultation')}
-             </button>
-           </div>
-         </div>
+            <button type="submit" className="btn-save" disabled={saving}>
+              {saving ? "Saving..." : isEditing ? "Update Consultation" : "Save Consultation"}
+            </button>
+          </div>
+        </div>
       </form>
 
       {/* AI Chatbot */}
-      <DoctorChatbot 
-        isOpen={chatbotOpen} 
-        onToggle={() => setChatbotOpen(!chatbotOpen)} 
-      />
+      <DoctorChatbot isOpen={chatbotOpen} onToggle={() => setChatbotOpen(!chatbotOpen)} />
     </div>
   );
 };

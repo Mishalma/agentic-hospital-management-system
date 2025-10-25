@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Grid,
@@ -15,8 +15,8 @@ import {
   Divider,
   Button,
   IconButton,
-  Tooltip
-} from '@mui/material';
+  Tooltip,
+} from "@mui/material";
 import {
   TrendingUp as TrendingUpIcon,
   People as PeopleIcon,
@@ -27,9 +27,9 @@ import {
   Warning as WarningIcon,
   CheckCircle as CheckIcon,
   Schedule as ScheduleIcon,
-  Assessment as AssessmentIcon
-} from '@mui/icons-material';
-import { Line, Bar, Doughnut } from 'react-chartjs-2';
+  Assessment as AssessmentIcon,
+} from "@mui/icons-material";
+import { Line, Bar, Doughnut } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -40,8 +40,8 @@ import {
   Title,
   Tooltip as ChartTooltip,
   Legend,
-  ArcElement
-} from 'chart.js';
+  ArcElement,
+} from "chart.js";
 
 // Register Chart.js components
 ChartJS.register(
@@ -70,59 +70,85 @@ const EnterpriseDashboard = () => {
       emergencyCases: 24,
       criticalCases: 3,
       averageWaitTime: 18,
-      bedOccupancy: 87
+      bedOccupancy: 87,
     },
     trends: {
       patients: [12000, 12500, 13200, 13800, 14200, 14800, 15420],
       appointments: [95, 102, 118, 125, 134, 129, 127],
-      revenue: [2100000, 2200000, 2300000, 2350000, 2400000, 2420000, 2450000]
+      revenue: [2100000, 2200000, 2300000, 2350000, 2400000, 2420000, 2450000],
     },
     recentActivities: [
-      { type: 'emergency', message: 'Critical case: Chest pain patient arrived via ambulance', time: '30 seconds ago', severity: 'error' },
-      { type: 'drug', message: 'High-risk drug interaction detected: Warfarin + Aspirin', time: '1 minute ago', severity: 'warning' },
-      { type: 'emergency', message: 'High priority case triaged - Score: 8/20', time: '2 minutes ago', severity: 'warning' },
-      { type: 'patient', message: 'New patient registered: John Doe', time: '3 minutes ago', severity: 'info' },
-      { type: 'emergency', message: 'Patient discharged from ED - Total stay: 2h 15m', time: '4 minutes ago', severity: 'success' },
-      { type: 'adr', message: 'ADR report submitted for Lisinopril', time: '5 minutes ago', severity: 'warning' },
-      { type: 'complaint', message: 'High priority complaint received', time: '7 minutes ago', severity: 'warning' },
-      { type: 'prescription', message: 'E-prescription sent to Central Pharmacy', time: '8 minutes ago', severity: 'success' },
-      { type: 'appointment', message: '15 appointments scheduled for tomorrow', time: '10 minutes ago', severity: 'success' },
-      { type: 'emergency', message: 'Deterioration alert: Patient vitals trending downward', time: '12 minutes ago', severity: 'error' },
-      { type: 'system', message: 'Backup completed successfully', time: '1 hour ago', severity: 'success' },
-      { type: 'alert', message: 'Equipment maintenance due', time: '2 hours ago', severity: 'warning' }
+      {
+        type: "emergency",
+        message: "Critical case: Chest pain patient arrived via ambulance",
+        time: "30 seconds ago",
+        severity: "error",
+      },
+      {
+        type: "drug",
+        message: "High-risk drug interaction detected: Warfarin + Aspirin",
+        time: "1 minute ago",
+        severity: "warning",
+      },
+      {
+        type: "emergency",
+        message: "High priority case triaged - Score: 8/20",
+        time: "2 minutes ago",
+        severity: "warning",
+      },
+      { type: "patient", message: "New patient registered: John Doe", time: "3 minutes ago", severity: "info" },
+      {
+        type: "emergency",
+        message: "Patient discharged from ED - Total stay: 2h 15m",
+        time: "4 minutes ago",
+        severity: "success",
+      },
+      { type: "adr", message: "ADR report submitted for Lisinopril", time: "5 minutes ago", severity: "warning" },
+      { type: "complaint", message: "High priority complaint received", time: "7 minutes ago", severity: "warning" },
+      {
+        type: "prescription",
+        message: "E-prescription sent to Central Pharmacy",
+        time: "8 minutes ago",
+        severity: "success",
+      },
+      {
+        type: "appointment",
+        message: "15 appointments scheduled for tomorrow",
+        time: "10 minutes ago",
+        severity: "success",
+      },
+      {
+        type: "emergency",
+        message: "Deterioration alert: Patient vitals trending downward",
+        time: "12 minutes ago",
+        severity: "error",
+      },
+      { type: "system", message: "Backup completed successfully", time: "1 hour ago", severity: "success" },
+      { type: "alert", message: "Equipment maintenance due", time: "2 hours ago", severity: "warning" },
     ],
     moduleStatus: [
-      { name: 'Patient Management', status: 'online', usage: 95 },
-      { name: 'Appointment System', status: 'online', usage: 87 },
-      { name: 'Emergency Case Management', status: 'online', usage: 92 },
-      { name: 'Laboratory Information System', status: 'online', usage: 84 },
-      { name: 'Hospital Billing Management', status: 'online', usage: 88 },
-      { name: 'Drug Information System', status: 'online', usage: 78 },
-      { name: 'E-Prescription System', status: 'online', usage: 82 },
-      { name: 'Pharmacy Management', status: 'online', usage: 91 },
-      { name: 'Inventory Management', status: 'online', usage: 72 },
-      { name: 'Communication Hub', status: 'online', usage: 89 }
-    ]
+      { name: "Patient Management", status: "online", usage: 95 },
+      { name: "Appointment System", status: "online", usage: 87 },
+      { name: "Emergency Case Management", status: "online", usage: 92 },
+      { name: "Laboratory Information System", status: "online", usage: 84 },
+      { name: "Hospital Billing Management", status: "online", usage: 88 },
+      { name: "Drug Information System", status: "online", usage: 78 },
+      { name: "E-Prescription System", status: "online", usage: 82 },
+      { name: "Pharmacy Management", status: "online", usage: 91 },
+      { name: "Inventory Management", status: "online", usage: 72 },
+      { name: "Communication Hub", status: "online", usage: 89 },
+    ],
   });
 
   const StatCard = ({ title, value, icon, color, trend, subtitle }) => (
-    <Card sx={{ height: '100%', background: `linear-gradient(135deg, ${color}15 0%, ${color}05 100%)` }}>
+    <Card sx={{ height: "100%", backgroundColor: "background.paper", border: `1px solid ${color}20` }}>
       <CardContent>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-          <Avatar sx={{ bgcolor: color, width: 56, height: 56 }}>
-            {icon}
-          </Avatar>
-          {trend && (
-            <Chip
-              icon={<TrendingUpIcon />}
-              label={`+${trend}%`}
-              color="success"
-              size="small"
-            />
-          )}
+        <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 2 }}>
+          <Avatar sx={{ bgcolor: color, width: 56, height: 56 }}>{icon}</Avatar>
+          {trend && <Chip icon={<TrendingUpIcon />} label={`+${trend}%`} color="success" size="small" />}
         </Box>
         <Typography variant="h4" fontWeight="bold" color={color}>
-          {typeof value === 'number' ? value.toLocaleString() : value}
+          {typeof value === "number" ? value.toLocaleString() : value}
         </Typography>
         <Typography variant="h6" color="text.primary" gutterBottom>
           {title}
@@ -141,7 +167,7 @@ const EnterpriseDashboard = () => {
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: 'top',
+        position: "top",
       },
     },
     scales: {
@@ -152,37 +178,37 @@ const EnterpriseDashboard = () => {
   };
 
   const patientTrendData = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"],
     datasets: [
       {
-        label: 'Total Patients',
+        label: "Total Patients",
         data: dashboardData.trends.patients,
-        borderColor: '#667eea',
-        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+        borderColor: "#1565c0", // Primary color from theme
+        backgroundColor: "rgba(21, 101, 192, 0.1)",
         tension: 0.4,
       },
     ],
   };
 
   const appointmentData = {
-    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
     datasets: [
       {
-        label: 'Daily Appointments',
+        label: "Daily Appointments",
         data: dashboardData.trends.appointments,
-        backgroundColor: 'rgba(76, 175, 80, 0.8)',
-        borderColor: '#4caf50',
+        backgroundColor: "rgba(76, 175, 80, 0.8)", // Success color from theme
+        borderColor: "#4caf50",
         borderWidth: 1,
       },
     ],
   };
 
   const moduleStatusData = {
-    labels: ['Online', 'Maintenance', 'Offline'],
+    labels: ["Online", "Maintenance", "Offline"],
     datasets: [
       {
         data: [85, 10, 5],
-        backgroundColor: ['#4caf50', '#ff9800', '#f44336'],
+        backgroundColor: ["#4caf50", "#ff9800", "#f44336"], // Success, warning, error colors from theme
         borderWidth: 0,
       },
     ],
@@ -190,25 +216,39 @@ const EnterpriseDashboard = () => {
 
   const getActivityIcon = (type) => {
     switch (type) {
-      case 'patient': return <PeopleIcon />;
-      case 'appointment': return <EventIcon />;
-      case 'complaint': return <WarningIcon />;
-      case 'system': return <CheckIcon />;
-      case 'drug': return <HospitalIcon />;
-      case 'adr': return <WarningIcon />;
-      case 'prescription': return <HospitalIcon />;
-      case 'emergency': return <HospitalIcon />;
-      case 'alert': return <WarningIcon />;
-      default: return <NotificationIcon />;
+      case "patient":
+        return <PeopleIcon />;
+      case "appointment":
+        return <EventIcon />;
+      case "complaint":
+        return <WarningIcon />;
+      case "system":
+        return <CheckIcon />;
+      case "drug":
+        return <HospitalIcon />;
+      case "adr":
+        return <WarningIcon />;
+      case "prescription":
+        return <HospitalIcon />;
+      case "emergency":
+        return <HospitalIcon />;
+      case "alert":
+        return <WarningIcon />;
+      default:
+        return <NotificationIcon />;
     }
   };
 
   const getActivityColor = (severity) => {
     switch (severity) {
-      case 'success': return '#4caf50';
-      case 'warning': return '#ff9800';
-      case 'error': return '#f44336';
-      default: return '#2196f3';
+      case "success":
+        return "#4caf50";
+      case "warning":
+        return "#ff9800";
+      case "error":
+        return "#f44336";
+      default:
+        return "#2196f3";
     }
   };
 
@@ -358,13 +398,7 @@ const EnterpriseDashboard = () => {
           />
         </Grid>
         <Grid item xs={12} sm={6} md={3}>
-          <StatCard
-            title="Safety Alerts"
-            value="3"
-            icon={<WarningIcon />}
-            color="#e67e22"
-            subtitle="Active warnings"
-          />
+          <StatCard title="Safety Alerts" value="3" icon={<WarningIcon />} color="#e67e22" subtitle="Active warnings" />
         </Grid>
       </Grid>
 
@@ -388,7 +422,7 @@ const EnterpriseDashboard = () => {
               <Typography variant="h6" gutterBottom>
                 🔧 System Status
               </Typography>
-              <Box sx={{ height: 250, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <Box sx={{ height: 250, display: "flex", justifyContent: "center", alignItems: "center" }}>
                 <Doughnut data={moduleStatusData} />
               </Box>
               <Box sx={{ mt: 2 }}>
@@ -418,15 +452,15 @@ const EnterpriseDashboard = () => {
 
         {/* Emergency Cases Widget */}
         <Grid item xs={12} md={6}>
-          <Card sx={{ height: 400, border: '1px solid #e74c3c' }}>
+          <Card sx={{ height: 400, border: "1px solid #e74c3c" }}>
             <CardContent>
-              <Typography variant="h6" gutterBottom sx={{ color: '#e74c3c' }}>
+              <Typography variant="h6" gutterBottom sx={{ color: "#e74c3c" }}>
                 🚨 Active Emergency Cases
               </Typography>
-              <List sx={{ maxHeight: 320, overflow: 'auto' }}>
+              <List sx={{ maxHeight: 320, overflow: "auto" }}>
                 <ListItem>
                   <ListItemAvatar>
-                    <Avatar sx={{ bgcolor: '#dc3545', width: 40, height: 40 }}>
+                    <Avatar sx={{ bgcolor: "#dc3545", width: 40, height: 40 }}>
                       <HospitalIcon />
                     </Avatar>
                   </ListItemAvatar>
@@ -437,7 +471,7 @@ const EnterpriseDashboard = () => {
                         <Typography variant="body2" color="text.secondary">
                           Patient: John Smith, 65M • Arrived: 2:30 PM
                         </Typography>
-                        <Typography variant="body2" sx={{ color: '#dc3545', fontWeight: 'bold' }}>
+                        <Typography variant="body2" sx={{ color: "#dc3545", fontWeight: "bold" }}>
                           Triage Score: 18/20 • Wait: 5 minutes
                         </Typography>
                       </Box>
@@ -447,7 +481,7 @@ const EnterpriseDashboard = () => {
                 <Divider />
                 <ListItem>
                   <ListItemAvatar>
-                    <Avatar sx={{ bgcolor: '#fd7e14', width: 40, height: 40 }}>
+                    <Avatar sx={{ bgcolor: "#fd7e14", width: 40, height: 40 }}>
                       <HospitalIcon />
                     </Avatar>
                   </ListItemAvatar>
@@ -458,7 +492,7 @@ const EnterpriseDashboard = () => {
                         <Typography variant="body2" color="text.secondary">
                           Patient: Sarah Johnson, 45F • Arrived: 2:15 PM
                         </Typography>
-                        <Typography variant="body2" sx={{ color: '#fd7e14', fontWeight: 'bold' }}>
+                        <Typography variant="body2" sx={{ color: "#fd7e14", fontWeight: "bold" }}>
                           Triage Score: 8/20 • Wait: 20 minutes
                         </Typography>
                       </Box>
@@ -468,7 +502,7 @@ const EnterpriseDashboard = () => {
                 <Divider />
                 <ListItem>
                   <ListItemAvatar>
-                    <Avatar sx={{ bgcolor: '#ffc107', width: 40, height: 40 }}>
+                    <Avatar sx={{ bgcolor: "#ffc107", width: 40, height: 40 }}>
                       <HospitalIcon />
                     </Avatar>
                   </ListItemAvatar>
@@ -479,7 +513,7 @@ const EnterpriseDashboard = () => {
                         <Typography variant="body2" color="text.secondary">
                           Patient: Mike Davis, 28M • Arrived: 1:45 PM
                         </Typography>
-                        <Typography variant="body2" sx={{ color: '#ffc107', fontWeight: 'bold' }}>
+                        <Typography variant="body2" sx={{ color: "#ffc107", fontWeight: "bold" }}>
                           Triage Score: 4/20 • Wait: 50 minutes
                         </Typography>
                       </Box>
@@ -489,7 +523,7 @@ const EnterpriseDashboard = () => {
                 <Divider />
                 <ListItem>
                   <ListItemAvatar>
-                    <Avatar sx={{ bgcolor: '#28a745', width: 40, height: 40 }}>
+                    <Avatar sx={{ bgcolor: "#28a745", width: 40, height: 40 }}>
                       <HospitalIcon />
                     </Avatar>
                   </ListItemAvatar>
@@ -500,7 +534,7 @@ const EnterpriseDashboard = () => {
                         <Typography variant="body2" color="text.secondary">
                           Patient: Lisa Brown, 32F • Arrived: 1:30 PM
                         </Typography>
-                        <Typography variant="body2" sx={{ color: '#28a745', fontWeight: 'bold' }}>
+                        <Typography variant="body2" sx={{ color: "#28a745", fontWeight: "bold" }}>
                           Triage Score: 2/20 • Wait: 1h 5m
                         </Typography>
                       </Box>
@@ -508,12 +542,8 @@ const EnterpriseDashboard = () => {
                   />
                 </ListItem>
               </List>
-              <Box sx={{ mt: 2, textAlign: 'center' }}>
-                <Button 
-                  variant="contained" 
-                  onClick={() => window.location.href = '/emergency'}
-                  sx={{ background: 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)' }}
-                >
+              <Box sx={{ mt: 2, textAlign: "center" }}>
+                <Button variant="contained" onClick={() => (window.location.href = "/emergency")} color="error">
                   View All Cases
                 </Button>
               </Box>
@@ -528,7 +558,7 @@ const EnterpriseDashboard = () => {
               <Typography variant="h6" gutterBottom>
                 🔔 Recent Activities
               </Typography>
-              <List sx={{ maxHeight: 320, overflow: 'auto' }}>
+              <List sx={{ maxHeight: 320, overflow: "auto" }}>
                 {dashboardData.recentActivities.map((activity, index) => (
                   <React.Fragment key={index}>
                     <ListItem>
@@ -540,8 +570,8 @@ const EnterpriseDashboard = () => {
                       <ListItemText
                         primary={activity.message}
                         secondary={activity.time}
-                        primaryTypographyProps={{ variant: 'body2' }}
-                        secondaryTypographyProps={{ variant: 'caption' }}
+                        primaryTypographyProps={{ variant: "body2" }}
+                        secondaryTypographyProps={{ variant: "caption" }}
                       />
                     </ListItem>
                     {index < dashboardData.recentActivities.length - 1 && <Divider />}
@@ -566,11 +596,11 @@ const EnterpriseDashboard = () => {
                   sx={{
                     p: 2,
                     border: 1,
-                    borderColor: 'divider',
+                    borderColor: "divider",
                     borderRadius: 2,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between'
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
                   }}
                 >
                   <Box>
@@ -579,21 +609,19 @@ const EnterpriseDashboard = () => {
                     </Typography>
                     <Chip
                       label={module.status}
-                      color={module.status === 'online' ? 'success' : module.status === 'maintenance' ? 'warning' : 'error'}
+                      color={
+                        module.status === "online" ? "success" : module.status === "maintenance" ? "warning" : "error"
+                      }
                       size="small"
                       sx={{ mt: 0.5 }}
                     />
                   </Box>
-                  <Box sx={{ textAlign: 'right', minWidth: 80 }}>
+                  <Box sx={{ textAlign: "right", minWidth: 80 }}>
                     <Typography variant="body2" color="text.secondary">
-                      {module.status === 'online' ? `${module.usage}% usage` : 'Offline'}
+                      {module.status === "online" ? `${module.usage}% usage` : "Offline"}
                     </Typography>
-                    {module.status === 'online' && (
-                      <LinearProgress
-                        variant="determinate"
-                        value={module.usage}
-                        sx={{ mt: 1, width: 60 }}
-                      />
+                    {module.status === "online" && (
+                      <LinearProgress variant="determinate" value={module.usage} sx={{ mt: 1, width: 60 }} />
                     )}
                   </Box>
                 </Box>
@@ -604,15 +632,15 @@ const EnterpriseDashboard = () => {
       </Card>
 
       {/* Emergency Department Section */}
-      <Card sx={{ mt: 3, border: '2px solid #e74c3c', borderRadius: 3 }}>
+      <Card sx={{ mt: 3, border: "2px solid #e74c3c", borderRadius: 3 }}>
         <CardContent>
-          <Typography variant="h6" gutterBottom sx={{ color: '#e74c3c', fontWeight: 'bold' }}>
+          <Typography variant="h6" gutterBottom sx={{ color: "#e74c3c", fontWeight: "bold" }}>
             🚨 Emergency Department
           </Typography>
           <Grid container spacing={2} sx={{ mb: 2 }}>
             <Grid item xs={12} sm={6} md={3}>
-              <Box sx={{ textAlign: 'center', p: 2, bgcolor: '#fff5f5', borderRadius: 2 }}>
-                <Typography variant="h4" sx={{ color: '#dc3545', fontWeight: 'bold' }}>
+              <Box sx={{ textAlign: "center", p: 2, bgcolor: "#fff5f5", borderRadius: 2 }}>
+                <Typography variant="h4" sx={{ color: "#dc3545", fontWeight: "bold" }}>
                   {dashboardData.stats.criticalCases}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
@@ -621,8 +649,8 @@ const EnterpriseDashboard = () => {
               </Box>
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
-              <Box sx={{ textAlign: 'center', p: 2, bgcolor: '#fff8e1', borderRadius: 2 }}>
-                <Typography variant="h4" sx={{ color: '#ff9800', fontWeight: 'bold' }}>
+              <Box sx={{ textAlign: "center", p: 2, bgcolor: "#fff8e1", borderRadius: 2 }}>
+                <Typography variant="h4" sx={{ color: "#ff9800", fontWeight: "bold" }}>
                   {dashboardData.stats.emergencyCases}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
@@ -631,8 +659,8 @@ const EnterpriseDashboard = () => {
               </Box>
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
-              <Box sx={{ textAlign: 'center', p: 2, bgcolor: '#e3f2fd', borderRadius: 2 }}>
-                <Typography variant="h4" sx={{ color: '#2196f3', fontWeight: 'bold' }}>
+              <Box sx={{ textAlign: "center", p: 2, bgcolor: "#e3f2fd", borderRadius: 2 }}>
+                <Typography variant="h4" sx={{ color: "#2196f3", fontWeight: "bold" }}>
                   {dashboardData.stats.averageWaitTime}m
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
@@ -641,8 +669,8 @@ const EnterpriseDashboard = () => {
               </Box>
             </Grid>
             <Grid item xs={12} sm={6} md={3}>
-              <Box sx={{ textAlign: 'center', p: 2, bgcolor: '#f3e5f5', borderRadius: 2 }}>
-                <Typography variant="h4" sx={{ color: '#9c27b0', fontWeight: 'bold' }}>
+              <Box sx={{ textAlign: "center", p: 2, bgcolor: "#f3e5f5", borderRadius: 2 }}>
+                <Typography variant="h4" sx={{ color: "#9c27b0", fontWeight: "bold" }}>
                   {dashboardData.stats.bedOccupancy}%
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
@@ -651,28 +679,28 @@ const EnterpriseDashboard = () => {
               </Box>
             </Grid>
           </Grid>
-          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-            <Button 
-              variant="contained" 
+          <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+            <Button
+              variant="contained"
               startIcon={<HospitalIcon />}
-              onClick={() => window.location.href = '/emergency'}
-              sx={{ background: 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)' }}
+              onClick={() => (window.location.href = "/emergency")}
+              color="error"
             >
               Emergency Dashboard
             </Button>
-            <Button 
-              variant="contained" 
+            <Button
+              variant="contained"
               startIcon={<EventIcon />}
-              onClick={() => window.location.href = '/emergency/case/new'}
-              sx={{ background: 'linear-gradient(135deg, #dc3545 0%, #b02a37 100%)' }}
+              onClick={() => (window.location.href = "/emergency/case/new")}
+              color="error"
             >
               New Emergency Case
             </Button>
-            <Button 
-              variant="outlined" 
+            <Button
+              variant="outlined"
               startIcon={<AssessmentIcon />}
-              onClick={() => window.location.href = '/triage-queue'}
-              sx={{ borderColor: '#e74c3c', color: '#e74c3c' }}
+              onClick={() => (window.location.href = "/triage-queue")}
+              sx={{ borderColor: "#e74c3c", color: "#e74c3c" }}
             >
               Triage Queue
             </Button>
@@ -686,73 +714,72 @@ const EnterpriseDashboard = () => {
           <Typography variant="h6" gutterBottom>
             ⚡ Quick Actions
           </Typography>
-          <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap' }}>
-            <Button 
-              variant="contained" 
-              startIcon={<EventIcon />}
-              onClick={() => window.location.href = '/register'}
-              sx={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}
-            >
+          <Box sx={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+            <Button variant="contained" startIcon={<EventIcon />} onClick={() => (window.location.href = "/register")}>
               Book New Appointment
             </Button>
-            <Button 
-              variant="contained" 
+            <Button
+              variant="contained"
               startIcon={<PeopleIcon />}
-              onClick={() => window.location.href = '/register?mode=patient-only'}
-              sx={{ background: 'linear-gradient(135deg, #4caf50 0%, #45a049 100%)' }}
+              onClick={() => (window.location.href = "/register?mode=patient-only")}
+              color="success"
             >
               Register Patient Only
             </Button>
-            <Button 
-              variant="contained" 
+            <Button
+              variant="contained"
               startIcon={<AssessmentIcon />}
-              onClick={() => window.location.href = '/admin'}
-              sx={{ background: 'linear-gradient(135deg, #ff9800 0%, #f57c00 100%)' }}
+              onClick={() => (window.location.href = "/admin")}
+              color="warning"
             >
               View Analytics
             </Button>
-            <Button 
-              variant="outlined" 
-              startIcon={<ScheduleIcon />}
-              onClick={() => window.location.href = '/queue'}
-            >
+            <Button variant="outlined" startIcon={<ScheduleIcon />} onClick={() => (window.location.href = "/queue")}>
               View Queue
             </Button>
-            <Button 
-              variant="outlined" 
+            <Button
+              variant="outlined"
               startIcon={<NotificationIcon />}
-              onClick={() => window.location.href = '/complaints'}
+              onClick={() => (window.location.href = "/complaints")}
             >
               Manage Complaints
             </Button>
-            <Button 
-              variant="contained" 
+            <Button
+              variant="contained"
               startIcon={<HospitalIcon />}
-              onClick={() => window.location.href = '/drug-information'}
-              sx={{ background: 'linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%)' }}
+              onClick={() => (window.location.href = "/drug-information")}
+              color="secondary"
             >
               Drug Information
             </Button>
-            <Button 
-              variant="outlined" 
+            <Button
+              variant="outlined"
               startIcon={<WarningIcon />}
-              onClick={() => window.location.href = '/adr-reporting'}
+              onClick={() => (window.location.href = "/adr-reporting")}
             >
               ADR Reporting
             </Button>
-            <Button 
-              variant="contained" 
+            <Button
+              variant="contained"
+              startIcon={<ScheduleIcon />}
+              onClick={() => (window.location.href = "/kiosk")}
+              color="secondary"
+            >
+              Kiosk Dashboard
+            </Button>
+            <Button
+              variant="contained"
               startIcon={<HospitalIcon />}
-              onClick={() => window.location.href = '/laboratory'}
-              sx={{ background: 'linear-gradient(135deg, #17a2b8 0%, #138496 100%)' }}
+              onClick={() => (window.location.href = "/laboratory")}
+              color="info"
             >
               Laboratory System
             </Button>
-            <Button 
-              variant="contained" 
+            <Button
+              variant="contained"
               startIcon={<MoneyIcon />}
-              onClick={() => window.location.href = '/billing'}
-              sx={{ background: 'linear-gradient(135deg, #f44336 0%, #d32f2f 100%)' }}
+              onClick={() => (window.location.href = "/billing")}
+              color="error"
             >
               Billing Management
             </Button>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Box,
   Drawer,
@@ -16,12 +16,13 @@ import {
   Collapse,
   Tooltip,
   useTheme,
-  useMediaQuery
-} from '@mui/material';
+  useMediaQuery,
+} from "@mui/material";
 import {
   Menu as MenuIcon,
   Notifications as NotificationsIcon,
   Settings as SettingsIcon,
+  AdminPanelSettings as AdminIcon,
   AccountCircle as AccountIcon,
   People as PatientsIcon,
   EventNote as AppointmentsIcon,
@@ -30,22 +31,24 @@ import {
   AttachMoney as BillingIcon,
   Report as ReportsIcon,
   Security as SecurityIcon,
+  Warning as WarningIcon,
+  Gavel as GavelIcon,
   ExpandLess,
   ExpandMore,
   ChevronLeft as ChevronLeftIcon,
-  ChevronRight as ChevronRightIcon
-} from '@mui/icons-material';
-import { useNavigate, useLocation } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
-import ModuleCard from './ModuleCard';
-import './EnterpriseLayout.css';
+  ChevronRight as ChevronRightIcon,
+} from "@mui/icons-material";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+import ModuleCard from "./ModuleCard";
+import "./EnterpriseLayout.css";
 
 const drawerWidth = 280;
 const collapsedDrawerWidth = 70;
 
 const EnterpriseLayout = ({ children }) => {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const navigate = useNavigate();
   const location = useLocation();
   const { user, logout, hasPermission, hasRole } = useAuth();
@@ -59,313 +62,356 @@ const EnterpriseLayout = ({ children }) => {
   // Hospital Management Modules - Role-based access
   const getHospitalModules = () => {
     const baseModules = {
-      'Patient Management': {
+      "Patient Management": {
         icon: <PatientsIcon />,
-        color: '#2196F3',
+        color: "#2196F3",
         modules: [
-          { 
-            name: 'Book Appointment', 
-            path: '/integrated-booking', 
-            icon: '📅', 
-            status: hasPermission('appointments', 'create') ? 'active' : 'restricted',
-            description: 'Register patient + book appointment',
-            requiredPermission: { module: 'appointments', action: 'create' }
+          {
+            name: "Kiosk Dashboard",
+            path: "/kiosk",
+            icon: "🖥️",
+            status: hasRole(["user", "admin"]) ? "active" : "restricted",
+            description: "Self-service kiosk interface for patient check-in and information",
           },
-          { name: 'Patient Records', path: '/patients', icon: '📋', status: 'coming-soon' },
-          { name: 'Patient Portal', path: '/patient-portal', icon: '🌐', status: 'coming-soon' },
-          { name: 'Insurance Management', path: '/insurance', icon: '🛡️', status: 'coming-soon' },
-          { name: 'Patient Analytics', path: '/patient-analytics', icon: '📊', status: 'coming-soon' }
-        ]
+          {
+            name: "Patient History Viewer",
+            path: "/patient-history",
+            icon: "📋",
+            status: hasRole("user") ? "active" : "restricted",
+            description: "View patient medical history, vitals, prescriptions, and consultations",
+            requiredRole: "user",
+          },
+        ],
       },
-      'Appointment & Scheduling': {
-        icon: <AppointmentsIcon />,
-        color: '#4CAF50',
+      "Medical Records & EMR": {
+        icon: <MedicalIcon />,
+        color: "#FF9800",
         modules: [
-          { 
-            name: 'Queue Management', 
-            path: '/queue-status', 
-            icon: '⏰', 
-            status: hasPermission('queue_management', 'read') ? 'active' : 'restricted',
-            description: 'Real-time queue status',
-            requiredPermission: { module: 'queue_management', action: 'read' }
+          {
+            name: "Vitals",
+            path: "/vitals",
+            icon: "🩺",
+            status: hasRole(["nurse", "doctor", "admin"]) ? "active" : "restricted",
+            description: "Record patient vitals on tablets/mobile and monitor abnormal vitals",
+            requiredRole: ["nurse", "doctor", "admin"],
           },
-          { name: 'Kiosk Mode', path: '/kiosk', icon: '🖥️', status: 'active', description: 'Self-service kiosk' },
-          { name: 'Doctor Scheduling', path: '/doctor-schedule', icon: '👨‍⚕️', status: 'coming-soon' },
-          { name: 'Resource Booking', path: '/resource-booking', icon: '🏥', status: 'coming-soon' },
-          { name: 'Waitlist Management', path: '/waitlist', icon: '📝', status: 'coming-soon' }
-        ]
+          {
+            name: "Triage Assessment",
+            path: "/triage-assessment",
+            icon: "🚨",
+            status: hasRole(["nurse", "doctor", "admin"]) ? "active" : "restricted",
+            description: "AI-powered patient prioritization",
+            requiredRole: ["nurse", "doctor", "admin"],
+          },
+          {
+            name: "Consultation Dashboard",
+            path: "/consultations",
+            icon: "👨‍⚕️",
+            status: hasRole(["doctor", "admin"]) ? "active" : "restricted",
+            description: "AI-powered consultation management",
+            requiredRole: ["doctor", "admin"],
+          },
+          {
+            name: "Prescription Manager",
+            path: "/prescription/new",
+            icon: "💊",
+            status: hasRole(["doctor", "admin"]) ? "active" : "restricted",
+            description: "AI-powered prescription management and tracking",
+            requiredRole: ["doctor", "admin"],
+          },
+          {
+            name: "Drug Information",
+            path: "/drug-information",
+            icon: "🔍",
+            status: hasRole(["doctor", "pharmacist", "admin"]) ? "active" : "restricted",
+            description: "Drug interactions, food interactions, and safety analysis",
+            requiredRole: ["doctor", "pharmacist", "admin"],
+          },
+          {
+            name: "ADR Reporting",
+            path: "/adr-reporting",
+            icon: "⚠️",
+            status: hasRole(["doctor", "pharmacist", "admin"]) ? "active" : "restricted",
+            description: "Adverse Drug Reaction reporting and management",
+            requiredRole: ["doctor", "pharmacist", "admin"],
+          },
+          {
+            name: "Xray AI Inference",
+            path: "http://10.147.19.62:8080/",
+            icon: "🩻",
+            status: hasRole(["doctor", "admin"]) ? "active" : "restricted",
+            description: "AI-powered X-ray analysis and inference",
+            requiredRole: ["doctor", "admin"],
+            external: true,
+          },
+          {
+            name: "Lab Order Management",
+            path: "/lab-orders",
+            icon: "📋",
+            status: hasRole(["lab_technician", "doctor", "admin"]) ? "active" : "restricted",
+            description: "Manage lab orders, sample tracking, and result entry",
+            requiredRole: ["lab_technician", "doctor", "admin"],
+          },
+        ],
       },
-    'Medical Records & EMR': {
-      icon: <MedicalIcon />,
-      color: '#FF9800',
-      modules: [
-        { 
-          name: 'Vitals Logging', 
-          path: '/vitals-logging', 
-          icon: '🩺', 
-          status: hasRole(['nurse', 'doctor', 'admin']) ? 'active' : 'restricted',
-          description: 'Record patient vitals on tablets/mobile',
-          requiredRole: ['nurse', 'doctor', 'admin']
-        },
-        { 
-          name: 'Vitals Dashboard', 
-          path: '/vitals-dashboard', 
-          icon: '📊', 
-          status: hasRole(['doctor', 'admin']) ? 'active' : 'restricted',
-          description: 'Monitor abnormal vitals and EMR sync',
-          requiredRole: ['doctor', 'admin']
-        },
-        { 
-          name: 'Triage Assessment', 
-          path: '/triage-assessment', 
-          icon: '🚨', 
-          status: hasRole(['nurse', 'doctor', 'admin']) ? 'active' : 'restricted',
-          description: 'AI-powered patient prioritization',
-          requiredRole: ['nurse', 'doctor', 'admin']
-        },
-        { 
-          name: 'Triage Queue', 
-          path: '/triage-queue', 
-          icon: '📋', 
-          status: hasRole(['doctor', 'admin']) ? 'active' : 'restricted',
-          description: 'View prioritized patient queue',
-          requiredRole: ['doctor', 'admin']
-        },
-        { 
-          name: 'Consultation Dashboard', 
-          path: '/consultations', 
-          icon: '👨‍⚕️', 
-          status: hasRole(['doctor', 'admin']) ? 'active' : 'restricted',
-          description: 'AI-powered consultation management',
-          requiredRole: ['doctor', 'admin']
-        },
-        { 
-          name: 'New Consultation', 
-          path: '/consultation/new', 
-          icon: '📝', 
-          status: hasRole(['doctor', 'admin']) ? 'active' : 'restricted',
-          description: 'Create new consultation with AI assistance',
-          requiredRole: ['doctor', 'admin']
-        },
-        { 
-          name: 'Prescription Manager', 
-          path: '/prescription/new', 
-          icon: '💊', 
-          status: hasRole(['doctor', 'admin']) ? 'active' : 'restricted',
-          description: 'AI-powered prescription management',
-          requiredRole: ['doctor', 'admin']
-        },
-        { 
-          name: 'E-Prescription Tracking', 
-          path: '/prescriptions/tracking', 
-          icon: '📋', 
-          status: hasRole(['doctor', 'admin']) ? 'active' : 'restricted',
-          description: 'Track prescription status in real-time',
-          requiredRole: ['doctor', 'admin']
-        },
-        { 
-          name: 'Drug Information', 
-          path: '/drug-information', 
-          icon: '🔍', 
-          status: hasRole(['doctor', 'pharmacist', 'admin']) ? 'active' : 'restricted',
-          description: 'Drug interactions, food interactions, and safety analysis',
-          requiredRole: ['doctor', 'pharmacist', 'admin']
-        },
-        { 
-          name: 'ADR Reporting', 
-          path: '/adr-reporting', 
-          icon: '⚠️', 
-          status: hasRole(['doctor', 'pharmacist', 'admin']) ? 'active' : 'restricted',
-          description: 'Adverse Drug Reaction reporting and management',
-          requiredRole: ['doctor', 'pharmacist', 'admin']
-        },
-        { 
-          name: 'Laboratory Dashboard', 
-          path: '/laboratory', 
-          icon: '🧪', 
-          status: hasRole(['lab_technician', 'doctor', 'admin']) ? 'active' : 'restricted',
-          description: 'Laboratory Information System - test orders and results',
-          requiredRole: ['lab_technician', 'doctor', 'admin']
-        },
-        { 
-          name: 'Lab Order Management', 
-          path: '/lab-orders', 
-          icon: '📋', 
-          status: hasRole(['lab_technician', 'doctor', 'admin']) ? 'active' : 'restricted',
-          description: 'Manage lab orders, sample tracking, and result entry',
-          requiredRole: ['lab_technician', 'doctor', 'admin']
-        },
-        { name: 'Electronic Health Records', path: '/ehr', icon: '📄', status: 'coming-soon' },
-        { name: 'Medical History', path: '/medical-history', icon: '🩺', status: 'coming-soon' },
-        { 
-          name: 'Lab Results', 
-          path: '/lab-results', 
-          icon: '🔬', 
-          status: hasRole(['lab_technician', 'doctor', 'admin']) ? 'active' : 'restricted',
-          description: 'View and manage laboratory test results',
-          requiredRole: ['lab_technician', 'doctor', 'admin']
-        },
-        { name: 'Radiology Reports', path: '/radiology', icon: '🔬', status: 'coming-soon' }
-      ]
-    },
-      'Communication & Support': {
+      "Communication & Support": {
         icon: <NotificationsIcon />,
-        color: '#9C27B0',
+        color: "#9C27B0",
         modules: [
-          { 
-            name: 'WhatsApp Integration', 
-            path: '/whatsapp', 
-            icon: '💬', 
-            status: hasRole('admin') ? 'active' : 'restricted',
-            requiredRole: 'admin'
+          {
+            name: "WhatsApp Integration",
+            path: "/whatsapp",
+            icon: "💬",
+            status: hasRole("admin") ? "active" : "restricted",
+            requiredRole: "admin",
           },
-          { 
-            name: 'Telegram Bot', 
-            path: '/telegram', 
-            icon: '📱', 
-            status: hasRole('admin') ? 'active' : 'restricted',
-            requiredRole: 'admin'
+          {
+            name: "Telegram Bot",
+            path: "/telegram",
+            icon: "📱",
+            status: hasRole("admin") ? "active" : "restricted",
+            requiredRole: "admin",
           },
-          { 
-            name: 'SMS Notifications', 
-            path: '/sms', 
-            icon: '📲', 
-            status: hasRole('admin') ? 'active' : 'restricted',
-            requiredRole: 'admin'
+          {
+            name: "SMS Notifications",
+            path: "/sms",
+            icon: "📲",
+            status: hasRole("admin") ? "active" : "restricted",
+            requiredRole: "admin",
           },
-          { 
-            name: 'Complaint Management', 
-            path: '/complaints', 
-            icon: '📝', 
-            status: hasPermission('complaints', 'read') ? 'active' : 'restricted',
-            requiredPermission: { module: 'complaints', action: 'read' }
+          {
+            name: "Complaint Management",
+            path: "/complaints",
+            icon: "📝",
+            status: hasPermission("complaints", "read") ? "active" : "restricted",
+            requiredPermission: { module: "complaints", action: "read" },
           },
-          { name: 'Patient Feedback', path: '/feedback', icon: '⭐', status: 'coming-soon' },
-          { name: 'Live Chat Support', path: '/live-chat', icon: '💭', status: 'coming-soon' }
-        ]
+        ],
       },
-    'Billing & Finance': {
-      icon: <BillingIcon />,
-      color: '#F44336',
-      modules: [
-        { 
-          name: 'Billing Dashboard', 
-          path: '/billing', 
-          icon: '💰', 
-          status: hasRole(['billing_staff', 'admin']) ? 'active' : 'restricted',
-          description: 'Centralized billing management across all departments',
-          requiredRole: ['billing_staff', 'admin']
-        },
-        { name: 'Insurance Claims', path: '/claims', icon: '📋', status: 'coming-soon' },
-        { name: 'Payment Processing', path: '/payments', icon: '💳', status: 'coming-soon' },
-        { name: 'Financial Reports', path: '/finance-reports', icon: '📊', status: 'coming-soon' },
-        { name: 'Revenue Analytics', path: '/revenue', icon: '📈', status: 'coming-soon' }
-      ]
-    },
-    'Pharmacy Information System': {
-      icon: <InventoryIcon />,
-      color: '#607D8B',
-      modules: [
-        { 
-          name: 'Pharmacy Dashboard', 
-          path: '/pharmacy', 
-          icon: '🏥', 
-          status: hasRole(['pharmacist', 'admin']) ? 'active' : 'restricted',
-          description: 'Real-time pharmacy analytics and alerts',
-          requiredRole: ['pharmacist', 'admin']
-        },
-        { 
-          name: 'Inventory Management', 
-          path: '/pharmacy/inventory', 
-          icon: '📦', 
-          status: hasRole(['pharmacist', 'admin']) ? 'active' : 'restricted',
-          description: 'Stock tracking with expiry alerts',
-          requiredRole: ['pharmacist', 'admin']
-        },
-        { 
-          name: 'E-Prescription Processing', 
-          path: '/pharmacy/prescriptions', 
-          icon: '💊', 
-          status: hasRole(['pharmacist', 'admin']) ? 'active' : 'restricted',
-          description: 'Digital prescription dispensing',
-          requiredRole: ['pharmacist', 'admin']
-        },
-        { 
-          name: 'Transaction Management', 
-          path: '/pharmacy/transactions', 
-          icon: '💰', 
-          status: hasRole(['pharmacist', 'admin']) ? 'active' : 'restricted',
-          description: 'Sales and billing management',
-          requiredRole: ['pharmacist', 'admin']
-        },
-        { 
-          name: 'Pharmacy Reports', 
-          path: '/pharmacy/reports', 
-          icon: '📊', 
-          status: hasRole(['pharmacist', 'admin']) ? 'active' : 'restricted',
-          description: 'Analytics and compliance reports',
-          requiredRole: ['pharmacist', 'admin']
-        },
-        { name: 'Equipment Management', path: '/equipment', icon: '🏥', status: 'coming-soon' },
-        { name: 'Supply Chain', path: '/supply-chain', icon: '📦', status: 'coming-soon' },
-        { name: 'Asset Tracking', path: '/assets', icon: '🏷️', status: 'coming-soon' }
-      ]
-    },
-    'Staff & HR Management': {
-      icon: <SecurityIcon />,
-      color: '#795548',
-      modules: [
-        { name: 'Staff Directory', path: '/staff', icon: '👥', status: 'coming-soon' },
-        { name: 'Shift Management', path: '/shifts', icon: '🕐', status: 'coming-soon' },
-        { name: 'Payroll System', path: '/payroll', icon: '💵', status: 'coming-soon' },
-        { name: 'Performance Reviews', path: '/reviews', icon: '⭐', status: 'coming-soon' },
-        { name: 'Training Programs', path: '/training', icon: '🎓', status: 'coming-soon' }
-      ]
-    },
-      'Analytics & Reports': {
-        icon: <ReportsIcon />,
-        color: '#3F51B5',
+      "Billing & Finance": {
+        icon: <BillingIcon />,
+        color: "#F44336",
         modules: [
-          { 
-            name: 'Dashboard Analytics', 
-            path: '/admin', 
-            icon: '📊', 
-            status: hasRole(['admin', 'doctor', 'nurse']) ? 'active' : 'restricted',
-            requiredRole: ['admin', 'doctor', 'nurse']
+          {
+            name: "Billing Dashboard",
+            path: "/billing",
+            icon: "💰",
+            status: hasRole(["billing_staff", "admin"]) ? "active" : "restricted",
+            description: "Centralized billing management across all departments",
+            requiredRole: ["billing_staff", "admin"],
           },
-          { 
-            name: 'Enterprise Dashboard', 
-            path: '/enterprise-dashboard', 
-            icon: '🏢', 
-            status: hasRole('admin') ? 'active' : 'restricted',
-            requiredRole: 'admin'
+        ],
+      },
+      "Pharmacy Information System": {
+        icon: <InventoryIcon />,
+        color: "#607D8B",
+        modules: [
+          {
+            name: "Pharmacy Dashboard",
+            path: "/pharmacy",
+            icon: "🏥",
+            status: hasRole(["pharmacist", "admin"]) ? "active" : "restricted",
+            description: "Real-time pharmacy analytics and alerts",
+            requiredRole: ["pharmacist", "admin"],
           },
-          { name: 'Patient Analytics', path: '/patient-reports', icon: '👥', status: 'coming-soon' },
-          { name: 'Financial Reports', path: '/financial-reports', icon: '💰', status: 'coming-soon' },
-          { name: 'Operational Reports', path: '/operational-reports', icon: '⚙️', status: 'coming-soon' },
-          { name: 'Compliance Reports', path: '/compliance', icon: '📋', status: 'coming-soon' }
-        ]
-      }
+          {
+            name: "Inventory Management",
+            path: "/pharmacy/inventory",
+            icon: "📦",
+            status: hasRole(["pharmacist", "admin"]) ? "active" : "restricted",
+            description: "Stock tracking with expiry alerts",
+            requiredRole: ["pharmacist", "admin"],
+          },
+          {
+            name: "E-Prescription Processing",
+            path: "/pharmacy/prescriptions",
+            icon: "💊",
+            status: hasRole(["pharmacist", "admin"]) ? "active" : "restricted",
+            description: "Digital prescription dispensing",
+            requiredRole: ["pharmacist", "admin"],
+          },
+          {
+            name: "Transaction Management",
+            path: "/pharmacy/transactions",
+            icon: "💰",
+            status: hasRole(["pharmacist", "admin"]) ? "active" : "restricted",
+            description: "Sales and billing management",
+            requiredRole: ["pharmacist", "admin"],
+          },
+          {
+            name: "Pharmacy Reports",
+            path: "/pharmacy/reports",
+            icon: "📊",
+            status: hasRole(["pharmacist", "admin"]) ? "active" : "restricted",
+            description: "Analytics and compliance reports",
+            requiredRole: ["pharmacist", "admin"],
+          },
+        ],
+      },
+      "Emergency & Legal": {
+        icon: <WarningIcon />,
+        color: "#FF5722",
+        modules: [
+          {
+            name: "Emergency Case Management",
+            path: "/emergency",
+            icon: "🚑",
+            status: hasRole(["emergency_staff", "doctor", "admin"]) ? "active" : "restricted",
+            description: "Emergency case management and triage",
+            requiredRole: ["emergency_staff", "doctor", "admin"],
+          },
+          {
+            name: "Legal Case (MLC)",
+            path: "/legal-mlc",
+            icon: "⚖️",
+            status: hasRole(["admin", "doctor"]) ? "active" : "restricted",
+            description: "Medico-Legal Cases and legal documentation",
+            requiredRole: ["admin", "doctor"],
+          },
+          {
+            name: "Admission and Bed Management",
+            path: "/admission-bed",
+            icon: "🛏️",
+            status: hasRole(["admin", "doctor", "nurse"]) ? "active" : "restricted",
+            description: "Patient admission and bed allocation",
+            requiredRole: ["admin", "doctor", "nurse"],
+          },
+          {
+            name: "Brought Dead Record",
+            path: "/brought-dead",
+            icon: "⚰️",
+            status: hasRole(["admin", "doctor"]) ? "active" : "restricted",
+            description: "Recording and management of brought dead cases",
+            requiredRole: ["admin", "doctor"],
+          },
+          {
+            name: "Digital Security Logging",
+            path: "/security-logging",
+            icon: "🔒",
+            status: hasRole("admin") ? "active" : "restricted",
+            description: "Security event logging and monitoring",
+            requiredRole: "admin",
+          },
+        ],
+      },
+      "Analytics & Reports": {
+        icon: <ReportsIcon />,
+        color: "#3F51B5",
+        modules: [
+          {
+            name: "Dashboard Analytics",
+            path: "/admin",
+            icon: "📊",
+            status: hasRole(["admin", "doctor"]) ? "active" : "restricted",
+            requiredRole: ["admin", "doctor"],
+          },
+          {
+            name: "Enterprise Dashboard",
+            path: "/enterprise-dashboard",
+            icon: "🏢",
+            status: hasRole("admin") ? "active" : "restricted",
+            requiredRole: "admin",
+          },
+          {
+            name: "EMR System",
+            path: "http://10.147.19.62:8080/",
+            icon: "📱",
+            status: hasRole("admin") ? "active" : "restricted",
+            requiredRole: "admin",
+            external: true,
+            description: "Access Electronic Medical Records system",
+          },
+        ],
+      },
     };
 
     // Add System Administration only for admins
-    if (hasRole('admin')) {
-      baseModules['System Administration'] = {
+    if (hasRole("admin")) {
+      baseModules["System Administration"] = {
         icon: <SettingsIcon />,
-        color: '#424242',
+        color: "#424242",
         modules: [
-          { 
-            name: 'User Registration', 
-            path: '/user-registration', 
-            icon: '👤', 
-            status: 'active',
-            description: 'Create new user accounts'
+          {
+            name: "User Registration",
+            path: "/user-registration",
+            icon: "👤",
+            status: "active",
+            description: "Create new user accounts",
           },
-          { name: 'Role & Permissions', path: '/permissions', icon: '🔐', status: 'coming-soon' },
-          { name: 'System Settings', path: '/settings', icon: '⚙️', status: 'coming-soon' },
-          { name: 'Backup & Recovery', path: '/backup', icon: '💾', status: 'coming-soon' },
-          { name: 'Audit Logs', path: '/audit', icon: '📝', status: 'coming-soon' }
-        ]
+          {
+            name: "Patient Search",
+            path: "/patient-search",
+            icon: "🔍",
+            status: "active",
+            description: "Search patients by name (Admin Only)",
+          },
+          { name: "Role & Permissions", path: "/permissions", icon: "🔐", status: "coming-soon" },
+          { name: "System Settings", path: "/settings", icon: "⚙️", status: "coming-soon" },
+          { name: "Backup & Recovery", path: "/backup", icon: "💾", status: "coming-soon" },
+          { name: "Audit Logs", path: "/audit", icon: "📝", status: "coming-soon" },
+        ],
+      };
+      baseModules["Admin Portal"] = {
+        icon: <AdminIcon />,
+        color: "#1976D2",
+        modules: [
+          {
+            name: "Admin Dashboard",
+            path: "http://localhost:3001",
+            icon: "🏠",
+            status: "active",
+            external: true,
+            description: "Access admin dashboard at localhost:3001",
+          },
+          {
+            name: "Operations",
+            path: "http://localhost:3001/operations",
+            icon: "⚙️",
+            status: "active",
+            external: true,
+            description: "Operations management dashboard",
+          },
+          {
+            name: "Quality",
+            path: "http://localhost:3001/quality",
+            icon: "⭐",
+            status: "active",
+            external: true,
+            description: "Quality management and metrics",
+          },
+          {
+            name: "Admin",
+            path: "http://localhost:3001/admin",
+            icon: "👑",
+            status: "active",
+            external: true,
+            description: "Administrative controls and settings",
+          },
+          {
+            name: "Support",
+            path: "http://localhost:3001/support",
+            icon: "🆘",
+            status: "active",
+            external: true,
+            description: "Technical support and help desk",
+          },
+          {
+            name: "Specialized",
+            path: "http://localhost:3001/specialized",
+            icon: "🎯",
+            status: "active",
+            external: true,
+            description: "Specialized services and departments",
+          },
+          {
+            name: "Compliance",
+            path: "http://localhost:3001/compliance",
+            icon: "📋",
+            status: "active",
+            external: true,
+            description: "Compliance monitoring and reporting",
+          },
+        ],
       };
     }
 
@@ -399,86 +445,92 @@ const EnterpriseLayout = ({ children }) => {
   };
 
   const handleModuleExpand = (moduleName) => {
-    setExpandedModules(prev => ({
+    setExpandedModules((prev) => ({
       ...prev,
-      [moduleName]: !prev[moduleName]
+      [moduleName]: !prev[moduleName],
     }));
   };
 
   const handleLogout = async () => {
     await logout();
-    navigate('/');
+    navigate("/");
     handleProfileMenuClose();
   };
 
   const renderModuleList = () => (
     <List sx={{ pt: 0 }}>
-      {Object.entries(hospitalModules).map(([categoryName, category]) => (
-        <React.Fragment key={categoryName}>
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              px: 2,
-              py: 1.5,
-              cursor: 'pointer',
-              '&:hover': { backgroundColor: 'rgba(0,0,0,0.04)' },
-              borderLeft: expandedModules[categoryName] ? `4px solid ${category.color}` : 'none'
-            }}
-            onClick={() => handleModuleExpand(categoryName)}
-          >
-            <Box sx={{ color: category.color, mr: drawerCollapsed ? 0 : 2 }}>
-              {category.icon}
+      {Object.entries(hospitalModules)
+        .filter(([categoryName, category]) => category.modules.some((module) => module.status === "active"))
+        .map(([categoryName, category]) => (
+          <React.Fragment key={categoryName}>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                px: 2,
+                py: 1.5,
+                cursor: "pointer",
+                "&:hover": { backgroundColor: "rgba(0,0,0,0.04)" },
+                borderLeft: expandedModules[categoryName] ? `4px solid ${category.color}` : "none",
+              }}
+              onClick={() => handleModuleExpand(categoryName)}
+            >
+              <Box sx={{ color: category.color, mr: drawerCollapsed ? 0 : 2 }}>{category.icon}</Box>
+              {!drawerCollapsed && (
+                <>
+                  <Typography variant="subtitle2" sx={{ flexGrow: 1, fontWeight: 600 }}>
+                    {categoryName}
+                  </Typography>
+                  {expandedModules[categoryName] ? <ExpandLess /> : <ExpandMore />}
+                </>
+              )}
             </Box>
+
             {!drawerCollapsed && (
-              <>
-                <Typography variant="subtitle2" sx={{ flexGrow: 1, fontWeight: 600 }}>
-                  {categoryName}
-                </Typography>
-                {expandedModules[categoryName] ? <ExpandLess /> : <ExpandMore />}
-              </>
+              <Collapse in={expandedModules[categoryName]} timeout="auto" unmountOnExit>
+                <List component="div" disablePadding>
+                  {category.modules
+                    .filter((module) => module.status === "active")
+                    .map((module) => (
+                      <ModuleCard
+                        key={module.name}
+                        module={module}
+                        isActive={location.pathname === module.path}
+                        onClick={() => {
+                          if (module.status === "active") {
+                            if (module.external) {
+                              window.open(module.path, "_blank");
+                            } else {
+                              navigate(module.path);
+                            }
+                          }
+                        }}
+                      />
+                    ))}
+                </List>
+              </Collapse>
             )}
-          </Box>
-          
-          {!drawerCollapsed && (
-            <Collapse in={expandedModules[categoryName]} timeout="auto" unmountOnExit>
-              <List component="div" disablePadding>
-                {category.modules.map((module) => (
-                  <ModuleCard
-                    key={module.name}
-                    module={module}
-                    isActive={location.pathname === module.path}
-                    onClick={() => {
-                      if (module.status === 'active') {
-                        navigate(module.path);
-                      }
-                    }}
-                  />
-                ))}
-              </List>
-            </Collapse>
-          )}
-          
-          {categoryName !== 'System Administration' && <Divider sx={{ my: 1 }} />}
-        </React.Fragment>
-      ))}
+
+            {categoryName !== "System Administration" && <Divider sx={{ my: 1 }} />}
+          </React.Fragment>
+        ))}
     </List>
   );
 
   const drawer = (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
       {/* Hospital Logo & Name */}
       <Box
         sx={{
           p: 2,
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          color: 'white',
-          textAlign: 'center'
+          backgroundColor: "primary.main", // Solid dark blue from theme
+          color: "primary.contrastText",
+          textAlign: "center",
         }}
       >
         {!drawerCollapsed ? (
           <>
-            <Typography variant="h5" sx={{ fontWeight: 'bold', mb: 0.5 }}>
+            <Typography variant="h5" sx={{ fontWeight: "bold", mb: 0.5 }}>
               🏥 HealthTech
             </Typography>
             <Typography variant="caption" sx={{ opacity: 0.9 }}>
@@ -491,16 +543,14 @@ const EnterpriseLayout = ({ children }) => {
       </Box>
 
       {/* Module Navigation */}
-      <Box sx={{ flexGrow: 1, overflow: 'auto' }}>
-        {renderModuleList()}
-      </Box>
+      <Box sx={{ flexGrow: 1, overflow: "auto" }}>{renderModuleList()}</Box>
 
       {/* Collapse Button */}
       {!isMobile && (
-        <Box sx={{ p: 1, borderTop: 1, borderColor: 'divider' }}>
+        <Box sx={{ p: 1, borderTop: 1, borderColor: "divider" }}>
           <IconButton
             onClick={handleDrawerCollapse}
-            sx={{ width: '100%', justifyContent: drawerCollapsed ? 'center' : 'flex-start' }}
+            sx={{ width: "100%", justifyContent: drawerCollapsed ? "center" : "flex-start" }}
           >
             {drawerCollapsed ? <ChevronRightIcon /> : <ChevronLeftIcon />}
             {!drawerCollapsed && (
@@ -515,15 +565,15 @@ const EnterpriseLayout = ({ children }) => {
   );
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh' }}>
+    <Box sx={{ display: "flex", minHeight: "100vh" }}>
       {/* App Bar */}
       <AppBar
         position="fixed"
         sx={{
           width: { md: `calc(100% - ${drawerCollapsed ? collapsedDrawerWidth : drawerWidth}px)` },
           ml: { md: `${drawerCollapsed ? collapsedDrawerWidth : drawerWidth}px` },
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
+          backgroundColor: "primary.main", // Solid dark blue from theme
+          boxShadow: "0 2px 8px rgba(0, 0, 0, 0.15)", // Adjusted shadow for solid color
         }}
       >
         <Toolbar>
@@ -532,7 +582,7 @@ const EnterpriseLayout = ({ children }) => {
             aria-label="open drawer"
             edge="start"
             onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { md: 'none' } }}
+            sx={{ mr: 2, display: { md: "none" } }}
           >
             <MenuIcon />
           </IconButton>
@@ -553,7 +603,7 @@ const EnterpriseLayout = ({ children }) => {
             label="System Online"
             color="success"
             size="small"
-            sx={{ mr: 2, color: 'white', backgroundColor: 'rgba(76, 175, 80, 0.8)' }}
+            sx={{ mr: 2, color: "white", backgroundColor: "rgba(76, 175, 80, 0.8)" }}
           />
 
           {/* Notifications */}
@@ -568,8 +618,8 @@ const EnterpriseLayout = ({ children }) => {
           {/* Profile Menu */}
           <Tooltip title="Account">
             <IconButton color="inherit" onClick={handleProfileMenuOpen}>
-              <Avatar sx={{ width: 32, height: 32, bgcolor: 'rgba(255,255,255,0.2)' }}>
-                {user?.fullName?.charAt(0) || user?.username?.charAt(0) || 'U'}
+              <Avatar sx={{ width: 32, height: 32, bgcolor: "rgba(255,255,255,0.2)" }}>
+                {user?.fullName?.charAt(0) || user?.username?.charAt(0) || "U"}
               </Avatar>
             </IconButton>
           </Tooltip>
@@ -587,8 +637,8 @@ const EnterpriseLayout = ({ children }) => {
           onClose={handleDrawerToggle}
           ModalProps={{ keepMounted: true }}
           sx={{
-            display: { xs: 'block', md: 'none' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth }
+            display: { xs: "block", md: "none" },
+            "& .MuiDrawer-paper": { boxSizing: "border-box", width: drawerWidth },
           }}
         >
           {drawer}
@@ -596,15 +646,15 @@ const EnterpriseLayout = ({ children }) => {
         <Drawer
           variant="permanent"
           sx={{
-            display: { xs: 'none', md: 'block' },
-            '& .MuiDrawer-paper': {
-              boxSizing: 'border-box',
+            display: { xs: "none", md: "block" },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
               width: drawerCollapsed ? collapsedDrawerWidth : drawerWidth,
-              transition: theme.transitions.create('width', {
+              transition: theme.transitions.create("width", {
                 easing: theme.transitions.easing.sharp,
                 duration: theme.transitions.duration.enteringScreen,
-              })
-            }
+              }),
+            },
           }}
           open
         >
@@ -618,14 +668,12 @@ const EnterpriseLayout = ({ children }) => {
         sx={{
           flexGrow: 1,
           width: { md: `calc(100% - ${drawerCollapsed ? collapsedDrawerWidth : drawerWidth}px)` },
-          minHeight: '100vh',
-          backgroundColor: '#f5f5f5'
+          minHeight: "100vh",
+          backgroundColor: "#f5f5f5",
         }}
       >
         <Toolbar />
-        <Box sx={{ p: 3 }}>
-          {children}
-        </Box>
+        <Box sx={{ p: 3 }}>{children}</Box>
       </Box>
 
       {/* Profile Menu */}
@@ -633,8 +681,8 @@ const EnterpriseLayout = ({ children }) => {
         anchorEl={anchorEl}
         open={Boolean(anchorEl)}
         onClose={handleProfileMenuClose}
-        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+        transformOrigin={{ horizontal: "right", vertical: "top" }}
+        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
       >
         <MenuItem onClick={handleProfileMenuClose}>
           <AccountIcon sx={{ mr: 2 }} />
@@ -655,11 +703,11 @@ const EnterpriseLayout = ({ children }) => {
         anchorEl={notificationAnchor}
         open={Boolean(notificationAnchor)}
         onClose={handleNotificationClose}
-        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+        transformOrigin={{ horizontal: "right", vertical: "top" }}
+        anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
         PaperProps={{ sx: { width: 320, maxHeight: 400 } }}
       >
-        <Box sx={{ p: 2, borderBottom: 1, borderColor: 'divider' }}>
+        <Box sx={{ p: 2, borderBottom: 1, borderColor: "divider" }}>
           <Typography variant="h6">Notifications</Typography>
         </Box>
         <MenuItem>

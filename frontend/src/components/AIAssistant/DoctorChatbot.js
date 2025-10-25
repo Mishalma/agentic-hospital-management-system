@@ -1,14 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
-import { useAuth } from '../../contexts/AuthContext';
-import './DoctorChatbot.css';
+import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
+import { useAuth } from "../../contexts/AuthContext";
+import "./DoctorChatbot.css";
 
 const DoctorChatbot = ({ isOpen, onToggle }) => {
   const { user } = useAuth();
   const [messages, setMessages] = useState([
     {
       id: 1,
-      type: 'bot',
+      type: "bot",
       content: `Hello Dr. ${user?.fullName || user?.username}! I'm your AI medical assistant. I can help you with:
       
 • Clinical decision support
@@ -19,23 +19,23 @@ const DoctorChatbot = ({ isOpen, onToggle }) => {
 • Latest medical research insights
 
 How can I assist you today?`,
-      timestamp: new Date()
-    }
+      timestamp: new Date(),
+    },
   ]);
-  const [inputMessage, setInputMessage] = useState('');
+  const [inputMessage, setInputMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [quickActions, setQuickActions] = useState([
-    'Drug interaction check',
-    'Differential diagnosis',
-    'Treatment guidelines',
-    'Dosage calculation',
-    'Lab interpretation',
-    'Emergency protocols'
+    "Drug interaction check",
+    "Differential diagnosis",
+    "Treatment guidelines",
+    "Dosage calculation",
+    "Lab interpretation",
+    "Emergency protocols",
   ]);
   const messagesEndRef = useRef(null);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(() => {
@@ -47,49 +47,51 @@ How can I assist you today?`,
 
     const userMessage = {
       id: Date.now(),
-      type: 'user',
+      type: "user",
       content: message,
-      timestamp: new Date()
+      timestamp: new Date(),
     };
 
-    setMessages(prev => [...prev, userMessage]);
-    setInputMessage('');
+    setMessages((prev) => [...prev, userMessage]);
+    setInputMessage("");
     setIsLoading(true);
 
     try {
       // Send to AI service
-      const response = await axios.post('/api/consultations/temp/ai-suggestions', {
+      const response = await axios.post("/api/consultations/temp/ai-suggestions", {
         message: message,
-        context: 'medical_consultation',
-        doctorId: user.id
+        context: "medical_consultation",
+        doctorId: user.id,
       });
       console.log(response);
 
       const botMessage = {
         id: Date.now() + 1,
-        type: 'bot',
-        content: response.data.response || 'I apologize, but I encountered an issue processing your request. Please try rephrasing your question.',
+        type: "bot",
+        content:
+          response.data.rawResponse ||
+          "I apologize, but I encountered an issue processing your request. Please try rephrasing your question.",
         timestamp: new Date(),
         confidence: response.data.confidence,
-        sources: response.data.sources
+        sources: response.data.sources,
       };
 
-      setMessages(prev => [...prev, botMessage]);
+      setMessages((prev) => [...prev, botMessage]);
     } catch (error) {
-      console.error('Error sending message:', error);
-      
+      console.error("Error sending message:", error);
+
       // Provide intelligent fallback responses
       const fallbackResponse = generateFallbackResponse(message);
-      
+
       const botMessage = {
         id: Date.now() + 1,
-        type: 'bot',
+        type: "bot",
         content: fallbackResponse,
         timestamp: new Date(),
-        isFallback: true
+        isFallback: true,
       };
 
-      setMessages(prev => [...prev, botMessage]);
+      setMessages((prev) => [...prev, botMessage]);
     } finally {
       setIsLoading(false);
     }
@@ -97,8 +99,8 @@ How can I assist you today?`,
 
   const generateFallbackResponse = (message) => {
     const msg = message.toLowerCase();
-    
-    if (msg.includes('drug') || msg.includes('medication') || msg.includes('interaction')) {
+
+    if (msg.includes("drug") || msg.includes("medication") || msg.includes("interaction")) {
       return `For drug interactions and medication queries:
 
 🔍 **Drug Interaction Checking:**
@@ -120,8 +122,8 @@ How can I assist you today?`,
 
 Would you like me to help with a specific medication query?`;
     }
-    
-    if (msg.includes('diagnosis') || msg.includes('differential') || msg.includes('symptom')) {
+
+    if (msg.includes("diagnosis") || msg.includes("differential") || msg.includes("symptom")) {
       return `For diagnostic support:
 
 🎯 **Differential Diagnosis Approach:**
@@ -147,8 +149,8 @@ Would you like me to help with a specific medication query?`;
 
 What specific clinical scenario would you like to discuss?`;
     }
-    
-    if (msg.includes('dose') || msg.includes('dosage') || msg.includes('calculation')) {
+
+    if (msg.includes("dose") || msg.includes("dosage") || msg.includes("calculation")) {
       return `For dosage calculations and prescribing:
 
 💊 **Dosing Considerations:**
@@ -171,8 +173,8 @@ What specific clinical scenario would you like to discuss?`;
 
 What dosing calculation do you need help with?`;
     }
-    
-    if (msg.includes('emergency') || msg.includes('urgent') || msg.includes('critical')) {
+
+    if (msg.includes("emergency") || msg.includes("urgent") || msg.includes("critical")) {
       return `For emergency and critical care:
 
 🚨 **Emergency Protocols:**
@@ -195,7 +197,7 @@ What dosing calculation do you need help with?`;
 
 What emergency situation are you managing?`;
     }
-    
+
     return `I'm here to help with your medical questions! I can assist with:
 
 🩺 **Clinical Support:**
@@ -226,49 +228,55 @@ Please feel free to ask me about any specific medical topic, patient case, or cl
     setMessages([
       {
         id: 1,
-        type: 'bot',
-        content: `Chat cleared! How can I assist you with your medical practice today, Dr. ${user?.fullName || user?.username}?`,
-        timestamp: new Date()
-      }
+        type: "bot",
+        content: `Chat cleared! How can I assist you with your medical practice today, Dr. ${
+          user?.fullName || user?.username
+        }?`,
+        timestamp: new Date(),
+      },
     ]);
   };
 
   const testGeminiConnection = async () => {
     setIsLoading(true);
     try {
-      const response = await axios.get('/api/consultations/test-gemini');
-      
+      const response = await axios.get("/api/consultations/test-gemini");
+
       const testMessage = {
         id: Date.now(),
-        type: 'bot',
+        type: "bot",
         content: `🧪 **Gemini AI Connection Test Results:**
 
-**Status:** ${response.data.success ? '✅ Connected' : '❌ Not Connected'}
+**Status:** ${response.data.success ? "✅ Connected" : "❌ Not Connected"}
 **Message:** ${response.data.message}
 
 **Details:**
-• API Key Present: ${response.data.details.apiKeyPresent ? '✅ Yes' : '❌ No'}
+• API Key Present: ${response.data.details.apiKeyPresent ? "✅ Yes" : "❌ No"}
 • API Key Length: ${response.data.details.apiKeyLength} characters
-• Model Initialized: ${response.data.details.modelInitialized ? '✅ Yes' : '❌ No'}
+• Model Initialized: ${response.data.details.modelInitialized ? "✅ Yes" : "❌ No"}
 
-${response.data.details.response ? `**Test Response:** ${response.data.details.response}` : ''}
-${response.data.details.error ? `**Error:** ${response.data.details.error}` : ''}
+${response.data.details.response ? `**Test Response:** ${response.data.details.response}` : ""}
+${response.data.details.error ? `**Error:** ${response.data.details.error}` : ""}
 
-${!response.data.success ? `
+${
+  !response.data.success
+    ? `
 **Troubleshooting:**
 • Check if GEMINI_API_KEY is set in backend/.env
 • Verify API key is valid at https://makersuite.google.com/app/apikey
 • Restart the backend server after changing .env
-• Check internet connection and API quotas` : ''}`,
+• Check internet connection and API quotas`
+    : ""
+}`,
         timestamp: new Date(),
-        isTest: true
+        isTest: true,
       };
 
-      setMessages(prev => [...prev, testMessage]);
+      setMessages((prev) => [...prev, testMessage]);
     } catch (error) {
       const errorMessage = {
         id: Date.now(),
-        type: 'bot',
+        type: "bot",
         content: `❌ **Connection Test Failed**
 
 Error: ${error.response?.data?.message || error.message}
@@ -280,10 +288,10 @@ This could indicate:
 
 Please check the backend server status and try again.`,
         timestamp: new Date(),
-        isTest: true
+        isTest: true,
       };
 
-      setMessages(prev => [...prev, errorMessage]);
+      setMessages((prev) => [...prev, errorMessage]);
     } finally {
       setIsLoading(false);
     }
@@ -292,18 +300,16 @@ Please check the backend server status and try again.`,
   const formatMessage = (content) => {
     // Convert markdown-like formatting to HTML
     return content
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.*?)\*/g, '<em>$1</em>')
-      .replace(/•/g, '•')
-      .replace(/\n/g, '<br/>');
+      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+      .replace(/\*(.*?)\*/g, "<em>$1</em>")
+      .replace(/•/g, "•")
+      .replace(/\n/g, "<br/>");
   };
 
   if (!isOpen) {
     return (
       <div className="chatbot-toggle" onClick={onToggle}>
-        <div className="chatbot-icon">
-          🤖
-        </div>
+        <div className="chatbot-icon">🤖</div>
         <div className="chatbot-badge">AI Assistant</div>
       </div>
     );
@@ -336,27 +342,18 @@ Please check the backend server status and try again.`,
         {messages.map((message) => (
           <div key={message.id} className={`message ${message.type}`}>
             <div className="message-content">
-              <div 
-                className="message-text"
-                dangerouslySetInnerHTML={{ __html: formatMessage(message.content) }}
-              />
-              {message.confidence && (
-                <div className="message-confidence">
-                  Confidence: {message.confidence}%
-                </div>
-              )}
+              <div className="message-text" dangerouslySetInnerHTML={{ __html: formatMessage(message.content) }} />
+              {message.confidence && <div className="message-confidence">Confidence: {message.confidence}%</div>}
               {message.isFallback && (
-                <div className="message-fallback">
-                  ⚠️ Offline response - AI service unavailable
-                </div>
+                <div className="message-fallback">⚠️ Offline response - AI service unavailable</div>
               )}
             </div>
             <div className="message-time">
-              {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              {message.timestamp.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
             </div>
           </div>
         ))}
-        
+
         {isLoading && (
           <div className="message bot">
             <div className="message-content">
@@ -368,17 +365,13 @@ Please check the backend server status and try again.`,
             </div>
           </div>
         )}
-        
+
         <div ref={messagesEndRef} />
       </div>
 
       <div className="quick-actions">
         {quickActions.map((action, index) => (
-          <button
-            key={index}
-            className="quick-action-btn"
-            onClick={() => handleQuickAction(action)}
-          >
+          <button key={index} className="quick-action-btn" onClick={() => handleQuickAction(action)}>
             {action}
           </button>
         ))}
@@ -392,23 +385,17 @@ Please check the backend server status and try again.`,
             placeholder="Ask me about diagnoses, treatments, drug interactions, dosing..."
             rows="2"
             onKeyPress={(e) => {
-              if (e.key === 'Enter' && !e.shiftKey) {
+              if (e.key === "Enter" && !e.shiftKey) {
                 e.preventDefault();
                 sendMessage();
               }
             }}
           />
-          <button 
-            className="send-btn" 
-            onClick={() => sendMessage()}
-            disabled={!inputMessage.trim() || isLoading}
-          >
+          <button className="send-btn" onClick={() => sendMessage()} disabled={!inputMessage.trim() || isLoading}>
             📤
           </button>
         </div>
-        <div className="input-hint">
-          Press Enter to send • Shift+Enter for new line
-        </div>
+        <div className="input-hint">Press Enter to send • Shift+Enter for new line</div>
       </div>
     </div>
   );

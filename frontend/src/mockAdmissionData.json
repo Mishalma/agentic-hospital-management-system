@@ -1,0 +1,29 @@
+{
+  "beds": [
+    { "id": 1, "ward": "General", "room": "101", "bedNumber": "A1", "status": "available" },
+    { "id": 2, "ward": "General", "room": "101", "bedNumber": "A2", "status": "occupied", "patientId": 1 },
+    { "id": 3, "ward": "ICU", "room": "201", "bedNumber": "B1", "status": "available" },
+    { "id": 4, "ward": "ICU", "room": "201", "bedNumber": "B2", "status": "occupied", "patientId": 2 },
+    { "id": 5, "ward": "Emergency", "room": "301", "bedNumber": "C1", "status": "available" }
+  ],
+  "admissions": [
+    {
+      "id": 1,
+      "patientId": 1,
+      "patientName": "John Doe",
+      "category": "General",
+      "bedId": 2,
+      "admissionDate": "2023-10-24",
+      "status": "active"
+    },
+    {
+      "id": 2,
+      "patientId": 2,
+      "patientName": "Jane Smith",
+      "category": "ICU",
+      "bedId": 4,
+      "admissionDate": "2023-10-23",
+      "status": "active"
+    }
+  ]
+}

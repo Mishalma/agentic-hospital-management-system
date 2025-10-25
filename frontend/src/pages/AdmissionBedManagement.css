@@ -1,0 +1,49 @@
+.admission-bed-management {
+  padding: 20px;
+  font-family: Arial, sans-serif;
+}
+
+.admission-bed-management h2 {
+  margin-bottom: 20px;
+}
+
+.bed-mapping,
+.admission-tracking,
+.patient-categories {
+  margin-bottom: 30px;
+}
+
+.bed-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+.bed-item {
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+  color: white;
+  text-align: center;
+}
+
+.admission-tracking table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admission-tracking th,
+.admission-tracking td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: left;
+}
+
+.patient-categories ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.patient-categories li {
+  padding: 5px 0;
+}

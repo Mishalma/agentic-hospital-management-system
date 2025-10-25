@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import './LaboratoryDashboard.css';
+import React, { useState, useEffect } from "react";
+import "./LaboratoryDashboard.css";
 
 const LaboratoryDashboard = () => {
   const [stats, setStats] = useState({
     ordersByStatus: [],
     resultsByCategory: [],
     averageTurnaroundTime: { hours: 0, minutes: 0 },
-    totalOrders: 0
+    totalOrders: 0,
   });
   const [pendingOrders, setPendingOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   useEffect(() => {
     fetchDashboardData();
@@ -19,26 +19,25 @@ const LaboratoryDashboard = () => {
   const fetchDashboardData = async () => {
     try {
       setLoading(true);
-      
+
       // Fetch statistics
-      const statsResponse = await fetch('/api/laboratory/statistics');
+      const statsResponse = await fetch("/api/laboratory/statistics");
       const statsData = await statsResponse.json();
-      
+
       // Fetch pending orders
-      const pendingResponse = await fetch('/api/laboratory/pending');
+      const pendingResponse = await fetch("/api/laboratory/pending");
       const pendingData = await pendingResponse.json();
-      
+
       if (statsData.success) {
         setStats(statsData.data);
       }
-      
+
       if (pendingData.success) {
         setPendingOrders(pendingData.data);
       }
-      
     } catch (error) {
-      console.error('Error fetching dashboard data:', error);
-      setError('Failed to load dashboard data');
+      console.error("Error fetching dashboard data:", error);
+      setError("Failed to load dashboard data");
     } finally {
       setLoading(false);
     }
@@ -46,22 +45,22 @@ const LaboratoryDashboard = () => {
 
   const getStatusColor = (status) => {
     const colors = {
-      'Pending': '#ffc107',
-      'Collected': '#17a2b8',
-      'Processing': '#fd7e14',
-      'Completed': '#28a745',
-      'Cancelled': '#dc3545'
+      Pending: "#ffc107",
+      Collected: "#17a2b8",
+      Processing: "#fd7e14",
+      Completed: "#28a745",
+      Cancelled: "#dc3545",
     };
-    return colors[status] || '#6c757d';
+    return colors[status] || "#6c757d";
   };
 
   const getPriorityColor = (priority) => {
     const colors = {
-      'Routine': '#28a745',
-      'Urgent': '#ffc107',
-      'STAT': '#dc3545'
+      Routine: "#28a745",
+      Urgent: "#ffc107",
+      STAT: "#dc3545",
     };
-    return colors[priority] || '#6c757d';
+    return colors[priority] || "#6c757d";
   };
 
   if (loading) {
@@ -80,26 +79,16 @@ const LaboratoryDashboard = () => {
       <div className="dashboard-header">
         <h1>Laboratory Information System</h1>
         <div className="header-actions">
-          <button 
-            className="btn btn-primary"
-            onClick={() => window.location.href = '/lab-orders'}
-          >
+          <button className="btn btn-primary" onClick={() => (window.location.href = "/lab-orders")}>
             View All Orders
           </button>
-          <button 
-            className="btn btn-success"
-            onClick={() => window.location.href = '/lab-results'}
-          >
+          <button className="btn btn-success" onClick={() => (window.location.href = "/lab-results")}>
             View Results
           </button>
         </div>
       </div>
 
-      {error && (
-        <div className="alert alert-danger">
-          {error}
-        </div>
-      )}
+      {error && <div className="alert alert-danger">{error}</div>}
 
       {/* Statistics Cards */}
       <div className="stats-grid">
@@ -110,15 +99,17 @@ const LaboratoryDashboard = () => {
             <p>Pending Orders</p>
           </div>
         </div>
-        
+
         <div className="stat-card">
           <div className="stat-icon">⏱️</div>
           <div className="stat-content">
-            <h3>{stats.averageTurnaroundTime.hours}h {stats.averageTurnaroundTime.minutes}m</h3>
+            <h3>
+              {stats.averageTurnaroundTime.hours}h {stats.averageTurnaroundTime.minutes}m
+            </h3>
             <p>Avg Turnaround Time</p>
           </div>
         </div>
-        
+
         <div className="stat-card">
           <div className="stat-icon">📊</div>
           <div className="stat-content">
@@ -126,11 +117,11 @@ const LaboratoryDashboard = () => {
             <p>Total Orders (30 days)</p>
           </div>
         </div>
-        
+
         <div className="stat-card">
           <div className="stat-icon">✅</div>
           <div className="stat-content">
-            <h3>{stats.ordersByStatus.find(s => s._id === 'Completed')?.count || 0}</h3>
+            <h3>{stats.ordersByStatus.find((s) => s._id === "Completed")?.count || 0}</h3>
             <p>Completed Today</p>
           </div>
         </div>
@@ -143,11 +134,11 @@ const LaboratoryDashboard = () => {
           <div className="status-chart">
             {stats.ordersByStatus.map((status, index) => (
               <div key={index} className="status-item">
-                <div 
+                <div
                   className="status-bar"
                   style={{
                     backgroundColor: getStatusColor(status._id),
-                    width: `${(status.count / Math.max(...stats.ordersByStatus.map(s => s.count))) * 100}%`
+                    width: `${(status.count / Math.max(...stats.ordersByStatus.map((s) => s.count))) * 100}%`,
                   }}
                 ></div>
                 <div className="status-label">
@@ -169,10 +160,10 @@ const LaboratoryDashboard = () => {
                   <span className="category-name">{category._id}</span>
                   <span className="category-count">{category.count}</span>
                 </div>
-                <div 
+                <div
                   className="category-bar"
                   style={{
-                    width: `${(category.count / Math.max(...stats.resultsByCategory.map(c => c.count))) * 100}%`
+                    width: `${(category.count / Math.max(...stats.resultsByCategory.map((c) => c.count))) * 100}%`,
                   }}
                 ></div>
               </div>
@@ -217,26 +208,20 @@ const LaboratoryDashboard = () => {
                       </div>
                     </td>
                     <td>
-                      <span 
-                        className="priority-badge"
-                        style={{ backgroundColor: getPriorityColor(order.priority) }}
-                      >
+                      <span className="priority-badge" style={{ backgroundColor: getPriorityColor(order.priority) }}>
                         {order.priority}
                       </span>
                     </td>
                     <td>
-                      <span 
-                        className="status-badge"
-                        style={{ backgroundColor: getStatusColor(order.status) }}
-                      >
+                      <span className="status-badge" style={{ backgroundColor: getStatusColor(order.status) }}>
                         {order.status}
                       </span>
                     </td>
                     <td>{new Date(order.orderDate).toLocaleDateString()}</td>
                     <td>
-                      <button 
+                      <button
                         className="btn btn-sm btn-primary"
-                        onClick={() => window.location.href = `/lab-orders/${order.orderId}`}
+                        onClick={() => (window.location.href = `/lab-orders/${order.orderId}`)}
                       >
                         View
                       </button>
@@ -253,31 +238,19 @@ const LaboratoryDashboard = () => {
       <div className="quick-actions">
         <h3>Quick Actions</h3>
         <div className="action-buttons">
-          <button 
-            className="action-btn"
-            onClick={() => window.location.href = '/lab-orders/new'}
-          >
+          <button className="action-btn" onClick={() => (window.location.href = "/lab-orders/new")}>
             <span className="action-icon">➕</span>
             New Lab Order
           </button>
-          <button 
-            className="action-btn"
-            onClick={() => window.location.href = '/sample-collection'}
-          >
+          <button className="action-btn" onClick={() => (window.location.href = "/sample-collection")}>
             <span className="action-icon">🧪</span>
             Sample Collection
           </button>
-          <button 
-            className="action-btn"
-            onClick={() => window.location.href = '/result-entry'}
-          >
+          <button className="action-btn" onClick={() => (window.location.href = "/result-entry")}>
             <span className="action-icon">📝</span>
             Result Entry
           </button>
-          <button 
-            className="action-btn"
-            onClick={() => window.location.href = '/lab-reports'}
-          >
+          <button className="action-btn" onClick={() => (window.location.href = "/lab-reports")}>
             <span className="action-icon">📊</span>
             Lab Reports
           </button>

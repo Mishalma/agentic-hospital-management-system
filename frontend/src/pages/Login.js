@@ -1,5 +1,4 @@
-
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Container,
   Paper,
@@ -19,45 +18,39 @@ import {
   InputAdornment,
   Divider,
   Fade,
-  Slide
-} from '@mui/material';
+  Slide,
+} from "@mui/material";
 import {
   Visibility,
   VisibilityOff,
   Login as LoginIcon,
   PersonAdd as RegisterIcon,
-  LocalHospital as HospitalIcon
-} from '@mui/icons-material';
-import { useFormik } from 'formik';
-import * as Yup from 'yup';
-import { useAuth } from '../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
+  LocalHospital as HospitalIcon,
+} from "@mui/icons-material";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import { useAuth } from "../contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 const loginValidationSchema = Yup.object({
-  username: Yup.string().required('Username is required'),
-  password: Yup.string().required('Password is required')
+  username: Yup.string().required("Username is required"),
+  password: Yup.string().required("Password is required"),
 });
 
 const registerValidationSchema = Yup.object({
   username: Yup.string()
-    .min(3, 'Username must be at least 3 characters')
-    .max(50, 'Username must be less than 50 characters')
-    .required('Username is required'),
-  email: Yup.string()
-    .email('Invalid email format')
-    .required('Email is required'),
-  password: Yup.string()
-    .min(6, 'Password must be at least 6 characters')
-    .required('Password is required'),
+    .min(3, "Username must be at least 3 characters")
+    .max(50, "Username must be less than 50 characters")
+    .required("Username is required"),
+  email: Yup.string().email("Invalid email format").required("Email is required"),
+  password: Yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
   confirmPassword: Yup.string()
-    .oneOf([Yup.ref('password'), null], 'Passwords must match')
-    .required('Confirm password is required'),
-  fullName: Yup.string()
-    .max(100, 'Full name must be less than 100 characters')
-    .required('Full name is required'),
-  role: Yup.string().required('Role is required'),
-  department: Yup.string().required('Department is required')
+    .oneOf([Yup.ref("password"), null], "Passwords must match")
+    .required("Confirm password is required"),
+  fullName: Yup.string().max(100, "Full name must be less than 100 characters").required("Full name is required"),
+  role: Yup.string().required("Role is required"),
+  department: Yup.string().required("Department is required"),
 });
 
 const AuthPage = () => {
@@ -68,20 +61,19 @@ const AuthPage = () => {
   const [loading, setLoading] = useState(false);
   const { setUser } = useAuth();
 
-
   const loginFormik = useFormik({
     initialValues: {
-      username: '',
-      password: ''
+      username: "",
+      password: "",
     },
     validationSchema: loginValidationSchema,
     onSubmit: async (values, { setSubmitting }) => {
       setLoading(true);
       try {
-        const response = await fetch('/api/auth/login', {
-          method: 'POST',
+        const response = await fetch("/api/auth/login", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify(values),
         });
@@ -89,62 +81,54 @@ const AuthPage = () => {
         const result = await response.json();
 
         if (result.success) {
-          localStorage.setItem('token', result.data.token);
-          localStorage.setItem('user', JSON.stringify(result.data.user));
+          localStorage.setItem("token", result.data.token);
+          localStorage.setItem("user", JSON.stringify(result.data.user));
 
-          
-          
-          toast.success('Login successful!');
-          
+          toast.success("Login successful!");
+
           // Navigate based on role
           const userRole = result.data.user.role;
           switch (userRole) {
-            case 'admin':
-              navigate('/enterprise-dashboard');
+            case "admin":
+              navigate("/enterprise-dashboard");
               break;
-            case 'doctor':
-              navigate('/admin');
-              break;
-            case 'receptionist':
-              navigate('/integrated-booking');
-              break;
-            case 'nurse':
-              navigate('/queue-status');
+            case "doctor":
+              navigate("/consultations");
               break;
             default:
-              navigate('/admin');
+              navigate("/kiosk");
           }
         } else {
-          toast.error(result.message || 'Login failed');
+          toast.error(result.message || "Login failed");
         }
       } catch (error) {
-        console.error('Login error:', error);
-        toast.error('Network error. Please try again.');
+        console.error("Login error:", error);
+        toast.error("Network error. Please try again.");
       } finally {
         setLoading(false);
         setSubmitting(false);
       }
-    }
+    },
   });
 
   const registerFormik = useFormik({
     initialValues: {
-      username: '',
-      email: '',
-      password: '',
-      confirmPassword: '',
-      fullName: '',
-      role: '',
-      department: ''
+      username: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      fullName: "",
+      role: "",
+      department: "",
     },
     validationSchema: registerValidationSchema,
     onSubmit: async (values, { setSubmitting, resetForm }) => {
       setLoading(true);
       try {
-        const response = await fetch('/api/auth/register', {
-          method: 'POST',
+        const response = await fetch("/api/auth/register", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             username: values.username,
@@ -152,83 +136,84 @@ const AuthPage = () => {
             password: values.password,
             fullName: values.fullName,
             role: values.role,
-            department: values.department
+            department: values.department,
           }),
         });
 
         const result = await response.json();
 
         if (result.success) {
-          toast.success('Registration successful! Please login.');
+          toast.success("Registration successful! Please login.");
           resetForm();
           setTabValue(0); // Switch to login tab
         } else {
-          toast.error(result.message || 'Registration failed');
+          toast.error(result.message || "Registration failed");
         }
       } catch (error) {
-        console.error('Registration error:', error);
-        toast.error('Network error. Please try again.');
+        console.error("Registration error:", error);
+        toast.error("Network error. Please try again.");
       } finally {
         setLoading(false);
         setSubmitting(false);
       }
-    }
+    },
   });
 
   const roles = [
-    { value: 'admin', label: 'Administrator' },
-    { value: 'receptionist', label: 'Receptionist' },
-    { value: 'doctor', label: 'Doctor' },
-    { value: 'nurse', label: 'Nurse' },
-    { value: 'pharmacist', label: 'Pharmacist' },
-    { value: 'lab_technician', label: 'Lab Technician' },
-    { value: 'billing_staff', label: 'Billing Staff' },
-    { value: 'hr_manager', label: 'HR Manager' },
-    { value: 'inventory_manager', label: 'Inventory Manager' },
-    { value: 'security_guard', label: 'Security Guard' }
+    { value: "admin", label: "Administrator" },
+    { value: "receptionist", label: "Receptionist" },
+    { value: "doctor", label: "Doctor" },
+    { value: "nurse", label: "Nurse" },
+    { value: "pharmacist", label: "Pharmacist" },
+    { value: "lab_technician", label: "Lab Technician" },
+    { value: "billing_staff", label: "Billing Staff" },
+    { value: "hr_manager", label: "HR Manager" },
+    { value: "inventory_manager", label: "Inventory Manager" },
+    { value: "security_guard", label: "Security Guard" },
+    { value: "user", label: "User" },
   ];
 
   const departments = [
-    { value: 'administration', label: 'Administration' },
-    { value: 'emergency', label: 'Emergency' },
-    { value: 'outpatient', label: 'Outpatient' },
-    { value: 'inpatient', label: 'Inpatient' },
-    { value: 'surgery', label: 'Surgery' },
-    { value: 'laboratory', label: 'Laboratory' },
-    { value: 'pharmacy', label: 'Pharmacy' },
-    { value: 'radiology', label: 'Radiology' },
-    { value: 'billing', label: 'Billing' }
+    { value: "administration", label: "Administration" },
+    { value: "emergency", label: "Emergency" },
+    { value: "outpatient", label: "Outpatient" },
+    { value: "inpatient", label: "Inpatient" },
+    { value: "surgery", label: "Surgery" },
+    { value: "laboratory", label: "Laboratory" },
+    { value: "pharmacy", label: "Pharmacy" },
+    { value: "radiology", label: "Radiology" },
+    { value: "billing", label: "Billing" },
   ];
 
   return (
     <Box
       sx={{
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        py: 4
+        minHeight: "100vh",
+        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        py: 4,
       }}
     >
       <Container maxWidth="md">
         <Fade in timeout={800}>
-          <Paper 
-            elevation={24} 
-            sx={{ 
+          <Paper
+            elevation={24}
+            sx={{
               borderRadius: 4,
-              overflow: 'hidden',
-              background: 'rgba(255, 255, 255, 0.95)',
-              backdropFilter: 'blur(10px)'
+              overflow: "hidden",
+              background: "rgba(255, 255, 255, 0.95)",
+              backdropFilter: "blur(10px)",
             }}
           >
             {/* Header */}
             <Box
               sx={{
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                color: 'white',
+                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                color: "white",
                 p: 4,
-                textAlign: 'center'
+                textAlign: "center",
               }}
             >
               <HospitalIcon sx={{ fontSize: 48, mb: 2 }} />
@@ -241,29 +226,21 @@ const AuthPage = () => {
             </Box>
 
             {/* Tabs */}
-            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-              <Tabs 
-                value={tabValue} 
+            <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+              <Tabs
+                value={tabValue}
                 onChange={(e, newValue) => setTabValue(newValue)}
                 centered
                 sx={{
-                  '& .MuiTab-root': {
+                  "& .MuiTab-root": {
                     minHeight: 64,
-                    fontSize: '1rem',
-                    fontWeight: 600
-                  }
+                    fontSize: "1rem",
+                    fontWeight: 600,
+                  },
                 }}
               >
-                <Tab 
-                  icon={<LoginIcon />} 
-                  label="Login" 
-                  iconPosition="start"
-                />
-                <Tab 
-                  icon={<RegisterIcon />} 
-                  label="Register" 
-                  iconPosition="start"
-                />
+                <Tab icon={<LoginIcon />} label="Login" iconPosition="start" />
+                <Tab icon={<RegisterIcon />} label="Register" iconPosition="start" />
               </Tabs>
             </Box>
 
@@ -274,7 +251,7 @@ const AuthPage = () => {
                   <Typography variant="h5" gutterBottom textAlign="center" sx={{ mb: 3 }}>
                     Welcome Back
                   </Typography>
-                  
+
                   <Box component="form" onSubmit={loginFormik.handleSubmit}>
                     <TextField
                       fullWidth
@@ -290,12 +267,12 @@ const AuthPage = () => {
                       required
                       sx={{ mb: 2 }}
                     />
-                    
+
                     <TextField
                       fullWidth
                       name="password"
                       label="Password"
-                      type={showPassword ? 'text' : 'password'}
+                      type={showPassword ? "text" : "password"}
                       value={loginFormik.values.password}
                       onChange={loginFormik.handleChange}
                       onBlur={loginFormik.handleBlur}
@@ -307,10 +284,7 @@ const AuthPage = () => {
                       InputProps={{
                         endAdornment: (
                           <InputAdornment position="end">
-                            <IconButton
-                              onClick={() => setShowPassword(!showPassword)}
-                              edge="end"
-                            >
+                            <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
                               {showPassword ? <VisibilityOff /> : <Visibility />}
                             </IconButton>
                           </InputAdornment>
@@ -318,29 +292,29 @@ const AuthPage = () => {
                       }}
                       sx={{ mb: 3 }}
                     />
-                    
+
                     <Button
                       type="submit"
                       fullWidth
                       variant="contained"
                       size="large"
                       disabled={loginFormik.isSubmitting || loading}
-                      sx={{ 
+                      sx={{
                         py: 1.5,
-                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                        '&:hover': {
-                          background: 'linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%)',
-                        }
+                        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                        "&:hover": {
+                          background: "linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%)",
+                        },
                       }}
                     >
-                      {loading ? 'Signing In...' : 'Sign In'}
+                      {loading ? "Signing In..." : "Sign In"}
                     </Button>
                   </Box>
 
                   <Alert severity="info" sx={{ mt: 3 }}>
                     <Typography variant="body2">
-                      <strong>First Time?</strong> Click the Register tab to create your account.
-                      Admin users can create accounts for other staff members.
+                      <strong>First Time?</strong> Click the Register tab to create your account. Admin users can create
+                      accounts for other staff members.
                     </Typography>
                   </Alert>
                 </Box>
@@ -354,7 +328,7 @@ const AuthPage = () => {
                   <Typography variant="h5" gutterBottom textAlign="center" sx={{ mb: 3 }}>
                     Create Account
                   </Typography>
-                  
+
                   <Box component="form" onSubmit={registerFormik.handleSubmit}>
                     <Grid container spacing={2}>
                       <Grid item xs={12} sm={6}>
@@ -371,7 +345,7 @@ const AuthPage = () => {
                           required
                         />
                       </Grid>
-                      
+
                       <Grid item xs={12} sm={6}>
                         <TextField
                           fullWidth
@@ -408,7 +382,7 @@ const AuthPage = () => {
                           fullWidth
                           name="password"
                           label="Password"
-                          type={showPassword ? 'text' : 'password'}
+                          type={showPassword ? "text" : "password"}
                           value={registerFormik.values.password}
                           onChange={registerFormik.handleChange}
                           onBlur={registerFormik.handleBlur}
@@ -419,10 +393,7 @@ const AuthPage = () => {
                           InputProps={{
                             endAdornment: (
                               <InputAdornment position="end">
-                                <IconButton
-                                  onClick={() => setShowPassword(!showPassword)}
-                                  edge="end"
-                                >
+                                <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
                                   {showPassword ? <VisibilityOff /> : <Visibility />}
                                 </IconButton>
                               </InputAdornment>
@@ -436,21 +407,20 @@ const AuthPage = () => {
                           fullWidth
                           name="confirmPassword"
                           label="Confirm Password"
-                          type={showConfirmPassword ? 'text' : 'password'}
+                          type={showConfirmPassword ? "text" : "password"}
                           value={registerFormik.values.confirmPassword}
                           onChange={registerFormik.handleChange}
                           onBlur={registerFormik.handleBlur}
-                          error={registerFormik.touched.confirmPassword && Boolean(registerFormik.errors.confirmPassword)}
+                          error={
+                            registerFormik.touched.confirmPassword && Boolean(registerFormik.errors.confirmPassword)
+                          }
                           helperText={registerFormik.touched.confirmPassword && registerFormik.errors.confirmPassword}
                           variant="outlined"
                           required
                           InputProps={{
                             endAdornment: (
                               <InputAdornment position="end">
-                                <IconButton
-                                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                  edge="end"
-                                >
+                                <IconButton onClick={() => setShowConfirmPassword(!showConfirmPassword)} edge="end">
                                   {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
                                 </IconButton>
                               </InputAdornment>
@@ -504,23 +474,23 @@ const AuthPage = () => {
                       variant="contained"
                       size="large"
                       disabled={registerFormik.isSubmitting || loading}
-                      sx={{ 
+                      sx={{
                         mt: 3,
                         py: 1.5,
-                        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                        '&:hover': {
-                          background: 'linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%)',
-                        }
+                        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                        "&:hover": {
+                          background: "linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%)",
+                        },
                       }}
                     >
-                      {loading ? 'Creating Account...' : 'Create Account'}
+                      {loading ? "Creating Account..." : "Create Account"}
                     </Button>
                   </Box>
 
                   <Alert severity="success" sx={{ mt: 3 }}>
                     <Typography variant="body2">
-                      <strong>Secure Registration:</strong> Your password will be encrypted and stored securely.
-                      Account permissions are assigned based on your selected role.
+                      <strong>Secure Registration:</strong> Your password will be encrypted and stored securely. Account
+                      permissions are assigned based on your selected role.
                     </Typography>
                   </Alert>
                 </Box>
