@@ -3,6 +3,7 @@ const cors = require("cors");
 const helmet = require("helmet");
 const http = require("http");
 const socketIo = require("socket.io");
+const path = require("path");
 require("dotenv").config();
 const geminiConfig = require("./config/gemini");
 
@@ -23,6 +24,9 @@ app.use(helmet());
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Serve static files from the React app build directory
+app.use(express.static(path.join(__dirname, "../frontend/build")));
 
 // Routes
 const { router: authRouter } = require("./routes/auth");
@@ -51,6 +55,11 @@ app.use("/api/security-logs", require("./routes/securityLogs"));
 // Health check
 app.get("/health", (req, res) => {
   res.json({ status: "OK", timestamp: new Date().toISOString() });
+});
+
+// Catch all handler: send back React's index.html file for any unmatched routes
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/build/index.html"));
 });
 
 // Socket.io for real-time updates
