@@ -16,6 +16,9 @@ import {
   Button,
   IconButton,
   Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
 } from "@mui/material";
 import {
   TrendingUp as TrendingUpIcon,
@@ -28,6 +31,7 @@ import {
   CheckCircle as CheckIcon,
   Schedule as ScheduleIcon,
   Assessment as AssessmentIcon,
+  Close as CloseIcon,
 } from "@mui/icons-material";
 import { Line, Bar, Doughnut } from "react-chartjs-2";
 import {
@@ -57,6 +61,7 @@ ChartJS.register(
 );
 
 const EnterpriseDashboard = () => {
+  const [showFeaturesPopup, setShowFeaturesPopup] = useState(true);
   const [dashboardData, setDashboardData] = useState({
     stats: {
       totalPatients: 15420,
@@ -254,6 +259,38 @@ const EnterpriseDashboard = () => {
 
   return (
     <Box sx={{ p: 3 }}>
+      {/* Features Popup */}
+      <Dialog open={showFeaturesPopup} onClose={() => setShowFeaturesPopup(false)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ textAlign: "center", pb: 1 }}>
+          <Typography variant="h5" component="div" sx={{ fontWeight: "bold", color: "primary.main" }}>
+            🚀 Advanced Features Available
+          </Typography>
+          <IconButton onClick={() => setShowFeaturesPopup(false)} sx={{ position: "absolute", right: 8, top: 8 }}>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ textAlign: "center", pb: 3 }}>
+          <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.6 }}>
+            There are more features like the{" "}
+            <Box component="span" sx={{ fontWeight: "bold", color: "primary.main" }}>
+              agentic AI conversational appointment booking through phone call
+            </Box>
+            , as well as{" "}
+            <Box component="span" sx={{ fontWeight: "bold", color: "primary.main" }}>
+              agentic WhatsApp chat
+            </Box>
+            , as well as a{" "}
+            <Box component="span" sx={{ fontWeight: "bold", color: "primary.main" }}>
+              chat based RAG system for the enterprise
+            </Box>
+            .
+          </Typography>
+          <Button variant="contained" onClick={() => setShowFeaturesPopup(false)} sx={{ mt: 2, minWidth: 120 }}>
+            Got it!
+          </Button>
+        </DialogContent>
+      </Dialog>
+
       {/* Page Header */}
       <Box sx={{ mb: 4 }}>
         <Typography variant="h4" fontWeight="bold" gutterBottom>

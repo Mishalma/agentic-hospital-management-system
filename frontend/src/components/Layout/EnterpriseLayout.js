@@ -137,7 +137,7 @@ const EnterpriseLayout = ({ children }) => {
           },
           {
             name: "Xray AI Inference",
-            path: "http://10.147.19.62:8080/",
+            path: "https://agentic-radiology-system.vercel.app",
             icon: "🩻",
             status: hasRole(["doctor", "admin"]) ? "active" : "restricted",
             description: "AI-powered X-ray analysis and inference",
@@ -314,7 +314,7 @@ const EnterpriseLayout = ({ children }) => {
           },
           {
             name: "EMR System",
-            path: "http://10.147.19.62:8080/",
+            path: "https://agentic-radiology-system.vercel.app",
             icon: "📱",
             status: hasRole("admin") ? "active" : "restricted",
             requiredRole: "admin",
@@ -357,7 +357,7 @@ const EnterpriseLayout = ({ children }) => {
         modules: [
           {
             name: "Admin Dashboard",
-            path: "http://localhost:3001",
+            path: "https://hospital-softwareservices.vercel.app/",
             icon: "🏠",
             status: "active",
             external: true,
@@ -365,7 +365,7 @@ const EnterpriseLayout = ({ children }) => {
           },
           {
             name: "Operations",
-            path: "http://localhost:3001/operations",
+            path: "https://hospital-softwareservices.vercel.app/operations",
             icon: "⚙️",
             status: "active",
             external: true,
@@ -373,7 +373,7 @@ const EnterpriseLayout = ({ children }) => {
           },
           {
             name: "Quality",
-            path: "http://localhost:3001/quality",
+            path: "https://hospital-softwareservices.vercel.app/quality",
             icon: "⭐",
             status: "active",
             external: true,
@@ -381,7 +381,7 @@ const EnterpriseLayout = ({ children }) => {
           },
           {
             name: "Admin",
-            path: "http://localhost:3001/admin",
+            path: "https://hospital-softwareservices.vercel.app/admin",
             icon: "👑",
             status: "active",
             external: true,
@@ -389,7 +389,7 @@ const EnterpriseLayout = ({ children }) => {
           },
           {
             name: "Support",
-            path: "http://localhost:3001/support",
+            path: "https://hospital-softwareservices.vercel.app/support",
             icon: "🆘",
             status: "active",
             external: true,
@@ -397,7 +397,7 @@ const EnterpriseLayout = ({ children }) => {
           },
           {
             name: "Specialized",
-            path: "http://localhost:3001/specialized",
+            path: "https://hospital-softwareservices.vercel.app/specialized",
             icon: "🎯",
             status: "active",
             external: true,
@@ -405,7 +405,7 @@ const EnterpriseLayout = ({ children }) => {
           },
           {
             name: "Compliance",
-            path: "http://localhost:3001/compliance",
+            path: "https://hospital-softwareservices.vercel.app/compliance",
             icon: "📋",
             status: "active",
             external: true,

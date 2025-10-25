@@ -3,6 +3,8 @@ import axios from "axios";
 import { useAuth } from "../contexts/AuthContext";
 import { usePatient } from "../contexts/PatientContext";
 import PrescriptionManager from "../components/PrescriptionManager";
+import { Dialog, DialogContent, DialogTitle, Typography, Button, Box, IconButton } from "@mui/material";
+import { Close as CloseIcon } from "@mui/icons-material";
 import "./ConsultationDashboard.css";
 
 const ConsultationDashboard = () => {
@@ -22,6 +24,7 @@ const ConsultationDashboard = () => {
   const [showTestRequestModal, setShowTestRequestModal] = useState(false);
   const [selectedConsultationForTest, setSelectedConsultationForTest] = useState(null);
   const [testCatalog, setTestCatalog] = useState([]);
+  const [showFeaturesPopup, setShowFeaturesPopup] = useState(true);
 
   useEffect(() => {
     fetchConsultations();
@@ -140,6 +143,38 @@ const ConsultationDashboard = () => {
 
   return (
     <div className="consultation-dashboard">
+      {/* Features Popup */}
+      <Dialog open={showFeaturesPopup} onClose={() => setShowFeaturesPopup(false)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ textAlign: "center", pb: 1 }}>
+          <Typography variant="h5" component="div" sx={{ fontWeight: "bold", color: "primary.main" }}>
+            🚀 Advanced Features Available
+          </Typography>
+          <IconButton onClick={() => setShowFeaturesPopup(false)} sx={{ position: "absolute", right: 8, top: 8 }}>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ textAlign: "center", pb: 3 }}>
+          <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.6 }}>
+            There are more features like the{" "}
+            <Box component="span" sx={{ fontWeight: "bold", color: "primary.main" }}>
+              agentic AI conversational appointment booking through phone call
+            </Box>
+            , as well as{" "}
+            <Box component="span" sx={{ fontWeight: "bold", color: "primary.main" }}>
+              agentic WhatsApp chat
+            </Box>
+            , as well as a{" "}
+            <Box component="span" sx={{ fontWeight: "bold", color: "primary.main" }}>
+              chat based RAG system for the enterprise
+            </Box>
+            .
+          </Typography>
+          <Button variant="contained" onClick={() => setShowFeaturesPopup(false)} sx={{ mt: 2, minWidth: 120 }}>
+            Got it!
+          </Button>
+        </DialogContent>
+      </Dialog>
+
       <div className="dashboard-header">
         <h1>Consultation Dashboard</h1>
         <div className="stats-cards">

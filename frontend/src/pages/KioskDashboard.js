@@ -27,10 +27,15 @@ import {
   CircularProgress,
   Avatar,
   Paper,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  IconButton,
 } from "@mui/material";
 import {
   PersonAdd as NewPatientIcon,
-  Search as ExistingPatientIcon,
+  Search as SearchIcon,
+  ExistingPatientIcon,
   TouchApp as TouchIcon,
   Person as PersonIcon,
   Event as EventIcon,
@@ -42,6 +47,7 @@ import {
   AccessTime as AccessTimeIcon,
   HospitalIcon,
   Refresh as RefreshIcon,
+  Close as CloseIcon,
 } from "@mui/icons-material";
 import { useSocket } from "../contexts/SocketContext";
 import axios from "axios";
@@ -89,6 +95,7 @@ const KioskDashboard = () => {
   const [queueLoading, setQueueLoading] = useState(true);
   const [searching, setSearching] = useState(false);
   const { socket, joinQueue } = useSocket();
+  const [showFeaturesPopup, setShowFeaturesPopup] = useState(true);
 
   const departments = [
     { id: "general", name: "General Medicine", icon: "🩺" },
@@ -1216,6 +1223,37 @@ const KioskDashboard = () => {
         },
       }}
     >
+      {/* Features Popup */}
+      <Dialog open={showFeaturesPopup} onClose={() => setShowFeaturesPopup(false)} maxWidth="sm" fullWidth>
+        <DialogTitle sx={{ textAlign: "center", pb: 1 }}>
+          <Typography variant="h5" component="div" sx={{ fontWeight: "bold", color: "primary.main" }}>
+            🚀 Advanced Features Available
+          </Typography>
+          <IconButton onClick={() => setShowFeaturesPopup(false)} sx={{ position: "absolute", right: 8, top: 8 }}>
+            <CloseIcon />
+          </IconButton>
+        </DialogTitle>
+        <DialogContent sx={{ textAlign: "center", pb: 3 }}>
+          <Typography variant="body1" sx={{ mb: 2, lineHeight: 1.6 }}>
+            There are more features like the{" "}
+            <Box component="span" sx={{ fontWeight: "bold", color: "primary.main" }}>
+              agentic AI conversational appointment booking through phone call
+            </Box>
+            , as well as{" "}
+            <Box component="span" sx={{ fontWeight: "bold", color: "primary.main" }}>
+              agentic WhatsApp chat
+            </Box>
+            , as well as a{" "}
+            <Box component="span" sx={{ fontWeight: "bold", color: "primary.main" }}>
+              chat based RAG system for the enterprise
+            </Box>
+            .
+          </Typography>
+          <Button variant="contained" onClick={() => setShowFeaturesPopup(false)} sx={{ mt: 2, minWidth: 120 }}>
+            Got it!
+          </Button>
+        </DialogContent>
+      </Dialog>
       {/* Kiosk Header */}
       <Box
         sx={{
