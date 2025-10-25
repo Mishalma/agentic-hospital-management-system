@@ -1,4 +1,4 @@
-# 🏥 HealthTech Scheduler - Advanced Healthcare Appointment System
+# 🏥 HealthTech - Agentic Healthcare system
 
 > **A comprehensive healthcare appointment scheduling system with multi-channel support, real-time queue management, and AI-powered multilingual capabilities.**
 
